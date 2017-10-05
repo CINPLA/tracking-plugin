@@ -1,8 +1,9 @@
-#ifndef TRACKERSTIMULATOR_H
-#define TRACKERSTIMULATOR_H
+#ifndef TRACKINGSTIMULATOR_H
+#define TRACKINGSTIMULATOR_H
 
 #include <ProcessorHeaders.h>
-#include "TrackerStimulatorEditor.h"
+#include "TrackingStimulatorEditor.h"
+#include "TrackingMessage.h"
 #include "serial/PulsePal.h"
 
 #include <vector>
@@ -51,20 +52,20 @@ private:
 
 };
 
-class TrackerStimulator : public GenericProcessor
+class TrackingStimulator : public GenericProcessor
 {
 
 public:
 
     enum priority {REPFIRST, TRAINFIRST};
 
-    TrackerStimulator();
-    ~TrackerStimulator();
+    TrackingStimulator();
+    ~TrackingStimulator();
 
     AudioProcessorEditor* createEditor();
 
-    virtual void process(AudioSampleBuffer& buffer, MidiBuffer& events) override;
-    virtual void handleEvent(int eventType, MidiMessage &event, int samplePosition) override;
+    void process(AudioSampleBuffer& buffer) override;
+    void handleEvent (const EventChannel* eventInfo, const MidiMessage& event, int) override;
     void saveCustomParametersToXml(XmlElement* parentElement) override;
     void loadCustomParametersFromXml() override;
 
@@ -135,7 +136,6 @@ public:
 
     int isPositionWithinCircles(float x, float y);
 
-    bool isSink(); //get the color correct
     bool isReady();
 
 
@@ -212,15 +212,10 @@ private:
     bool saveParametersXml();
     bool loadParametersXml(File loadFile);
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TrackerStimulator);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TrackingStimulator);
 };
 
-inline bool TrackerStimulator::isSink()
-{
-    return true;
-}
 
-
-#endif // TRACKERSTIMULATOR_H
+#endif // TRACKINGSTIMULATOR_H
 
 

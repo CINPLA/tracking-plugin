@@ -1,23 +1,23 @@
-#ifndef TRACKERSTIMULATORCANVAS_H
-#define TRACKERSTIMULATORCANVAS_H
+#ifndef TRACKINGSTIMULATORCANVAS_H
+#define TRACKINGSTIMULATORCANVAS_H
 
 
 #include <VisualizerWindowHeaders.h>
-#include "TrackerStimulatorEditor.h"
-#include "TrackerStimulator.h"
+#include "TrackingStimulatorEditor.h"
+#include "TrackingStimulator.h"
 
 
 class DisplayAxes;
 
-class TrackerStimulatorCanvas : public Visualizer,
+class TrackingStimulatorCanvas : public Visualizer,
         public Button::Listener,
         public Label::Listener,
         public KeyListener
 //        public ComboBox::Listener,
 {
 public:
-    TrackerStimulatorCanvas(TrackerStimulator* trackerStimulator);
-    ~TrackerStimulatorCanvas();
+    TrackingStimulatorCanvas(TrackingStimulator* TrackingStimulator);
+    ~TrackingStimulatorCanvas();
 
     void paint (Graphics&);
     void resized();
@@ -25,7 +25,7 @@ public:
     void initButtons();
     void initLabels();
 
-    TrackerStimulator* getProcessor();
+    TrackingStimulator* getProcessor();
 
     // KeyListener interface
     virtual bool keyPressed(const KeyPress &key, Component *originatingComponent);
@@ -107,7 +107,7 @@ public:
 
 
 private:
-    TrackerStimulator* processor;
+    TrackingStimulator* processor;
     float m_x;
     float m_y;
     float m_prevx;
@@ -132,7 +132,7 @@ private:
     ScopedPointer<DisplayAxes> m_ax;
 
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TrackerStimulatorCanvas);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TrackingStimulatorCanvas);
 };
 
 ///**
@@ -144,7 +144,7 @@ private:
 class DisplayAxes : public Component
 {
 public:
-    DisplayAxes(TrackerStimulator* trackerStimulator, TrackerStimulatorCanvas* trackerStimulatorCanvas);
+    DisplayAxes(TrackingStimulator* TrackingStimulator, TrackingStimulatorCanvas* TrackingStimulatorCanvas);
     ~DisplayAxes();
 
     void setXLims(double xmin, double xmax);
@@ -170,8 +170,8 @@ private:
     double xlims[2];
     double ylims[2];
 
-    TrackerStimulator* processor;
-    TrackerStimulatorCanvas* canvas;
+    TrackingStimulator* processor;
+    TrackingStimulatorCanvas* canvas;
 
     Colour selectedCircleColour;
     Colour unselectedCircleColour;
@@ -198,4 +198,4 @@ private:
 
 };
 
-#endif // TRACKERSTIMULATORCANVAS_H
+#endif // TRACKINGSTIMULATORCANVAS_H

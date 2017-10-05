@@ -20,7 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 // Originally programmed by Josh Seigle as part of the Open Ephys GUI, <http://open-ephys.org>
 // Modified by Joshua Sanders where indicated in comments below)
-//#include "stdafx.h"
+// Modified by Alessio Buccino where inficated in comments
+
 #include <vector>
 #include <stdio.h>
 #include <stdint.h>
@@ -94,13 +95,10 @@ void PulsePal::initialize()
     //
 
    vector<ofSerialDeviceInfo> devices = serial.getDeviceList();
-   uint8_t nDevices = devices.size();
    bool foundDevice = false;
-   bool foundDeviceIndex = 0;
-   uint8_t deviceIndex = 0;
    string path, name;
 
-   for (int i = 0; i<devices.size() && !foundDevice; i++)
+   for (int i = 0; i<devices.size() && !foundDevice; i++) //AB 29/9/17: cycle through devices to find PulsePal
    {
 	   int id = devices[i].getDeviceID();
 	   path = devices[i].getDevicePath();
@@ -115,15 +113,7 @@ void PulsePal::initialize()
 	   }
    }
 
-   /*while ((!foundDevice) && (deviceIndex < nDevices)){
-	   string name = devices[deviceIndex].getDeviceName();
-	   if (name == portString) {
-		   foundDevice = true;
-		   foundDeviceIndex = deviceIndex;
-	   }
-	   deviceIndex++;
-   }*/
-   if (foundDevice) {
+   if (foundDevice) { // AB 29/9/17: check if PulsePal 1st or 2nd generation is connected
 
 	   if (firmwareVersion < 20) {
 		   std::cout << "Pulse Pal 1 was found on port " << name << "." << std::endl;

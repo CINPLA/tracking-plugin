@@ -1,18 +1,19 @@
 /*
   ==============================================================================
 
-    PositionTracker.h
+    TrackingVisualizer.h
     Created: 5 Oct 2015 11:34:58am
     Author:  mikkel
 
   ==============================================================================
 */
 
-#ifndef POSITIONTRACKER_H_INCLUDED
-#define POSITIONTRACKER_H_INCLUDED
+#ifndef TRACKINGVISUALIZER_H_INCLUDED
+#define TRACKINGVISUALIZER_H_INCLUDED
 
 #include <ProcessorHeaders.h>
-#include "PositionTrackerEditor.h"
+#include "TrackingVisualizerEditor.h"
+#include "TrackingMessage.h"
 
 #include <vector>
 
@@ -21,16 +22,16 @@
 //==============================================================================
 /*
 */
-class PositionTracker : public GenericProcessor
+class TrackingVisualizer : public GenericProcessor
 {
 public:
-    PositionTracker();
-    ~PositionTracker();
+    TrackingVisualizer();
+    ~TrackingVisualizer();
 
     AudioProcessorEditor* createEditor();
 
-    void process(AudioSampleBuffer& buffer, MidiBuffer& events) override;
-    void handleEvent(int eventType, MidiMessage &event, int samplePosition) override;
+    void process(AudioSampleBuffer& buffer) override;
+    void handleEvent (const EventChannel* eventInfo, const MidiMessage& event, int) override;
 
     float getX(int s) const;
     float getY(int s) const;
@@ -46,7 +47,7 @@ public:
     void clearPositionUpdated();
     bool positionIsUpdated() const;
 
-    bool isSink(); //get the color correct
+//    bool isSink(); //get the color correct
 
 private:
     std::vector<float> m_x;
@@ -61,13 +62,13 @@ private:
     int m_sources;
     std::vector<uint8> m_ids;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PositionTracker);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TrackingVisualizer);
 };
 
-inline bool PositionTracker::isSink()
-{
-    return true;
-}
+//inline bool TrackingVisualizer::isSink()
+//{
+//    return true;
+//}
 
 
-#endif  // POSITIONTRACKER_H_INCLUDED
+#endif  // TRACKINGVISUALIZER_H_INCLUDED

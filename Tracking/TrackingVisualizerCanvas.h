@@ -1,22 +1,22 @@
 /*
   ==============================================================================
 
-    PositionTrackerCanvas.h
+    TrackingVisualizerCanvas.h
     Created: 5 Oct 2015 12:09:00pm
     Author:  mikkel
 
   ==============================================================================
 */
 
-#ifndef POSITIONTRACKERCANVAS_H_INCLUDED
-#define POSITIONTRACKERCANVAS_H_INCLUDED
+#ifndef TRACKINGVISUALIZERCANVAS_H_INCLUDED
+#define TRACKINGVISUALIZERCANVAS_H_INCLUDED
 
 #include <VisualizerWindowHeaders.h>
-#include "PositionTrackerEditor.h"
-#include "PositionTracker.h"
+#include "TrackingVisualizerEditor.h"
+#include "TrackingVisualizer.h"
 #include <vector>
 
-class PositionTracker;
+class TrackingVisualizer;
 
 class Position
 {
@@ -31,14 +31,14 @@ public:
 //==============================================================================
 /*
 */
-class PositionTrackerCanvas : public Visualizer,
+class TrackingVisualizerCanvas : public Visualizer,
         public ComboBox::Listener,
         public Button::Listener,
         public KeyListener
 {
 public:
-    PositionTrackerCanvas(PositionTracker* positionTracker);
-    ~PositionTrackerCanvas();
+    TrackingVisualizerCanvas(TrackingVisualizer* TrackingVisualizer);
+    ~TrackingVisualizerCanvas();
 
     void paint (Graphics&);
     void resized();
@@ -62,7 +62,7 @@ public:
     virtual void setParameter(int, int, int, float);
 
 private:
-    PositionTracker* processor;
+    TrackingVisualizer* processor;
     float m_x;
     float m_y;
     float m_width;
@@ -99,8 +99,8 @@ private:
     void initButtonsAndLabels();
 
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PositionTrackerCanvas);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TrackingVisualizerCanvas);
 };
 
 
-#endif  // POSITIONTRACKERCANVAS_H_INCLUDED
+#endif  // TRACKINGVISUALIZERCANVAS_H_INCLUDED

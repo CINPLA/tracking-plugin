@@ -1,15 +1,15 @@
 /*
   ==============================================================================
 
-    PositionTrackerCanvas.cpp
+    TrackingVisualizerCanvas.cpp
     Created: 5 Oct 2015 12:09:00pm
     Author:  mikkel
 
   ==============================================================================
 */
 
-#include "PositionTrackerCanvas.h"
-#include "PositionTracker.h"
+#include "TrackingVisualizerCanvas.h"
+#include "TrackingVisualizer.h"
 
 #include <math.h>
 #include <string>
@@ -23,8 +23,8 @@ Position::Position(float xin, float yin, float widthin, float heightin)
 
 }
 
-PositionTrackerCanvas::PositionTrackerCanvas(PositionTracker *positionTracker)
-    : processor(positionTracker)
+TrackingVisualizerCanvas::TrackingVisualizerCanvas(TrackingVisualizer *TrackingVisualizer)
+    : processor(TrackingVisualizer)
     , m_width(1.0)
     , m_height(1.0)
     , m_prevSet(false)
@@ -58,7 +58,7 @@ PositionTrackerCanvas::PositionTrackerCanvas(PositionTracker *positionTracker)
         }
     }
 
-    /*String path = "/home/alessiob/Documents/Codes/C++/OpenEphys/open-ephys-plugin-GUI/Source/Plugins/PositionTracker/rodent.png";
+    /*String path = "/home/alessiob/Documents/Codes/C++/OpenEphys/open-ephys-plugin-GUI/Source/Plugins/TrackingVisualizer/rodent.png";
     File file(path);
     File f = File::getCurrentWorkingDirectory();
     String fullpath = f.getFullPathName();
@@ -72,7 +72,7 @@ PositionTrackerCanvas::PositionTrackerCanvas(PositionTracker *positionTracker)
 
     if (m_imgExists)
     {
-        File f = File("/home/alessiob/Documents/Codes/C++/OpenEphys/open-ephys-plugin-GUI/Source/Plugins/PositionTracker/rodent.png");
+        File f = File("/home/alessiob/Documents/Codes/C++/OpenEphys/open-ephys-plugin-GUI/Source/Plugins/TrackingVisualizer/rodent.png");
         rodentImg = ImageFileFormat::loadFrom(f).rescaled(m_img_scale, m_img_scale);
     }
 
@@ -80,12 +80,12 @@ PositionTrackerCanvas::PositionTrackerCanvas(PositionTracker *positionTracker)
     update();
 }
 
-PositionTrackerCanvas::~PositionTrackerCanvas()
+TrackingVisualizerCanvas::~TrackingVisualizerCanvas()
 {
     TopLevelWindow::getTopLevelWindow(0)->removeKeyListener(this);
 }
 
-void PositionTrackerCanvas::paint (Graphics& g)
+void TrackingVisualizerCanvas::paint (Graphics& g)
 {
 
     float plot_height = 0.97*getHeight();
@@ -183,7 +183,7 @@ void PositionTrackerCanvas::paint (Graphics& g)
 
 }
 
-void PositionTrackerCanvas::resized()
+void TrackingVisualizerCanvas::resized()
 {
     clearButton->setBounds(0.01*getWidth(), getHeight()-0.05*getHeight(), 0.1*getWidth(), 0.03*getHeight());
     redButton->setBounds(0.01*getWidth(), getHeight()-0.2*getHeight(), 0.1*getWidth(), 0.03*getHeight());
@@ -209,12 +209,12 @@ void PositionTrackerCanvas::resized()
 }
 
 
-bool PositionTrackerCanvas::keyPressed(const KeyPress &key, Component *originatingComponent)
+bool TrackingVisualizerCanvas::keyPressed(const KeyPress &key, Component *originatingComponent)
 {
     return false;
 }
 
-void PositionTrackerCanvas::buttonClicked(Button* button)
+void TrackingVisualizerCanvas::buttonClicked(Button* button)
 {
     if (button == clearButton)
     {
@@ -288,19 +288,19 @@ void PositionTrackerCanvas::buttonClicked(Button* button)
     }
 }
 
-void PositionTrackerCanvas::comboBoxChanged(ComboBox *comboBoxThatHasChanged)
+void TrackingVisualizerCanvas::comboBoxChanged(ComboBox *comboBoxThatHasChanged)
 {
 }
 
-void PositionTrackerCanvas::refreshState()
+void TrackingVisualizerCanvas::refreshState()
 {
 }
 
-void PositionTrackerCanvas::update()
+void TrackingVisualizerCanvas::update()
 {
 }
 
-void PositionTrackerCanvas::refresh()
+void TrackingVisualizerCanvas::refresh()
 {
     if (processor->positionIsUpdated()) {
         for (int i = 0; i<processor->getNSources(); i++)
@@ -326,25 +326,25 @@ void PositionTrackerCanvas::refresh()
     }
 }
 
-void PositionTrackerCanvas::beginAnimation()
+void TrackingVisualizerCanvas::beginAnimation()
 {
     startCallbacks();
 }
 
-void PositionTrackerCanvas::endAnimation()
+void TrackingVisualizerCanvas::endAnimation()
 {
     stopCallbacks();
 }
 
-void PositionTrackerCanvas::setParameter(int, float)
+void TrackingVisualizerCanvas::setParameter(int, float)
 {
 }
 
-void PositionTrackerCanvas::setParameter(int, int, int, float)
+void TrackingVisualizerCanvas::setParameter(int, int, int, float)
 {
 }
 
-void PositionTrackerCanvas::clear()
+void TrackingVisualizerCanvas::clear()
 {
     for (int i = 0; i<MAX_SOURCES; i++)
         m_positions[i].clear();
@@ -353,7 +353,7 @@ void PositionTrackerCanvas::clear()
     repaint();
 }
 
-void PositionTrackerCanvas::initButtonsAndLabels()
+void TrackingVisualizerCanvas::initButtonsAndLabels()
 {
     clearButton = new UtilityButton("Clear plot", Font("Small Text", 13, Font::plain));
     clearButton->setRadius(3.0f);

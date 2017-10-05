@@ -1,22 +1,22 @@
 /*
   ==============================================================================
 
-    TrackerStimulatorEditor.cpp
+    TrackingStimulatorEditor.cpp
     Created: 28 Jun 2016 11:59:59am
     Author:  alessio
 
   ==============================================================================
 */
 
-#include "TrackerStimulatorEditor.h"
-#include "TrackerStimulator.h"
-#include "TrackerStimulatorCanvas.h"
+#include "TrackingStimulatorEditor.h"
+#include "TrackingStimulator.h"
+#include "TrackingStimulatorCanvas.h"
 
 
-TrackerStimulatorEditor::TrackerStimulatorEditor(GenericProcessor* parentNode, bool useDefaultParameterEditors=true)
+TrackingStimulatorEditor::TrackingStimulatorEditor(GenericProcessor* parentNode, bool useDefaultParameterEditors=true)
     : VisualizerEditor(parentNode, useDefaultParameterEditors)
 {
-    tabText = "TrackerStimulator";
+    tabText = "TrackingStimulator";
     desiredWidth = 200;
 
 
@@ -79,26 +79,26 @@ TrackerStimulatorEditor::TrackerStimulatorEditor(GenericProcessor* parentNode, b
     stimLabel->setFont(Font("Default", 12, Font::plain));
     addAndMakeVisible(stimLabel);
 
-    TrackerStimulator *p= (TrackerStimulator *)getProcessor();
+    TrackingStimulator *p= (TrackingStimulator *)getProcessor();
     p->setStimSyncChan(syncStimChanSelector->getSelectedId()-1);
     p->setTTLSyncChan(syncTTLChanSelector->getSelectedId()-1);
     syncStimChan = syncStimChanSelector->getSelectedId()-1;
 
 }
 
-TrackerStimulatorEditor::~TrackerStimulatorEditor()
+TrackingStimulatorEditor::~TrackingStimulatorEditor()
 {
     //deleteAllChildren();
 }
 
-Visualizer* TrackerStimulatorEditor::createNewCanvas()
+Visualizer* TrackingStimulatorEditor::createNewCanvas()
 {
-    TrackerStimulator* processor = (TrackerStimulator*) getProcessor();
-    return new TrackerStimulatorCanvas(processor);
+    TrackingStimulator* processor = (TrackingStimulator*) getProcessor();
+    return new TrackingStimulatorCanvas(processor);
 }
 
 
-void TrackerStimulatorEditor::buttonEvent(Button* button)
+void TrackingStimulatorEditor::buttonEvent(Button* button)
 {
 //    int gId = button->getRadioGroupId();
 
@@ -114,14 +114,14 @@ void TrackerStimulatorEditor::buttonEvent(Button* button)
     // testPattern
     if (button == testPatternButton)
     {
-        TrackerStimulator *p= (TrackerStimulator *)getProcessor();
+        TrackingStimulator *p= (TrackingStimulator *)getProcessor();
 
         if (!button->isDown())
             p->testStimulation();
     }
     else if (button == syncButton)
     {
-        TrackerStimulator *p= (TrackerStimulator *)getProcessor();
+        TrackingStimulator *p= (TrackingStimulator *)getProcessor();
 
         if (!button->isDown())
             p->syncStimulation(syncStimChan);
@@ -129,12 +129,12 @@ void TrackerStimulatorEditor::buttonEvent(Button* button)
     else if (button == stimulateButton)
     {
         if (button->getToggleState()==true){
-            TrackerStimulator *p= (TrackerStimulator *)getProcessor();
+            TrackingStimulator *p= (TrackingStimulator *)getProcessor();
             p->startStimulation();
             stimulateButton->setButtonText(String("ON"));
         }
         else {
-            TrackerStimulator *p= (TrackerStimulator *)getProcessor();
+            TrackingStimulator *p= (TrackingStimulator *)getProcessor();
             p->stopStimulation();
             stimulateButton->setButtonText(String("OFF"));
         }
@@ -142,16 +142,16 @@ void TrackerStimulatorEditor::buttonEvent(Button* button)
 
 }
 
-void TrackerStimulatorEditor::comboBoxChanged(ComboBox* c)
+void TrackingStimulatorEditor::comboBoxChanged(ComboBox* c)
 {
     if (c==syncStimChanSelector)
     {
-        TrackerStimulator *p= (TrackerStimulator *)getProcessor();
+        TrackingStimulator *p= (TrackingStimulator *)getProcessor();
         p->setStimSyncChan(c->getSelectedId()-1);
     }
     else if (c==syncTTLChanSelector)
     {
-        TrackerStimulator *p= (TrackerStimulator *)getProcessor();
+        TrackingStimulator *p= (TrackingStimulator *)getProcessor();
         p->setTTLSyncChan(c->getSelectedId()-1);
         syncStimChan = c->getSelectedId()-1;
     }

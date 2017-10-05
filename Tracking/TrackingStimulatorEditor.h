@@ -1,16 +1,16 @@
-#ifndef TRACKERSTIMULATOREDITOR_H
-#define TRACKERSTIMULATOREDITOR_H
+#ifndef TRACKINGSTIMULATOREDITOR_H
+#define TRACKINGSTIMULATOREDITOR_H
 
 
 #include <VisualizerEditorHeaders.h>
 #include <EditorHeaders.h>
 
-class TrackerStimulatorEditor : public VisualizerEditor
+class TrackingStimulatorEditor : public VisualizerEditor
         , public ComboBox::Listener
 {
 public:
-    TrackerStimulatorEditor(GenericProcessor* parentNode, bool useDefaultParameterEditors);
-    virtual ~TrackerStimulatorEditor();
+    TrackingStimulatorEditor(GenericProcessor* parentNode, bool useDefaultParameterEditors);
+    virtual ~TrackingStimulatorEditor();
 
     // Listener Interface
     void buttonEvent(Button* button);
@@ -35,8 +35,8 @@ private:
     ScopedPointer<Label> ttlLabel;
     ScopedPointer<Label> stimLabel;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TrackerStimulatorEditor);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TrackingStimulatorEditor);
 };
 
 
-#endif // TRACKERSTIMULATOREDITOR_H
+#endif // TrackingSTIMULATOREDITOR_H

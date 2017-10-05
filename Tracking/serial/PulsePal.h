@@ -25,8 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define __PULSEPAL_H_F2B7B63E__
 
 #include <string.h>
-
-#include "ofSerial.h"
+#include <SerialLib.h>
 
 /**
   Interface to PulsePal 

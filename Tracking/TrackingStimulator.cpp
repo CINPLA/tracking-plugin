@@ -1,20 +1,20 @@
 /*
   ==============================================================================
 
-    TrackerStimulator.cpp
+    TrackingStimulator.cpp
     Created: 11 Mar 2016 11:59:38am
     Author:  alessio
 
   ==============================================================================
 */
 
-#include "TrackerStimulator.h"
-#include "TrackerStimulatorEditor.h"
+#include "TrackingStimulator.h"
+#include "TrackingStimulatorEditor.h"
 
 #include "../../UI/EditorViewport.h"
 
-TrackerStimulator::TrackerStimulator()
-    : GenericProcessor("Tracker Stimulator")
+TrackingStimulator::TrackingStimulator()
+    : GenericProcessor("Tracking Stim")
     , m_isOn(false)
     , m_x(-1.0)
     , m_y(-1.0)
@@ -66,166 +66,166 @@ TrackerStimulator::TrackerStimulator()
 
 }
 
-TrackerStimulator::~TrackerStimulator()
+TrackingStimulator::~TrackingStimulator()
 {
 
 }
 
-AudioProcessorEditor* TrackerStimulator::createEditor()
+AudioProcessorEditor* TrackingStimulator::createEditor()
 {
-    editor = new TrackerStimulatorEditor(this, true);
+    editor = new TrackingStimulatorEditor(this, true);
     return editor;
 }
 
 
 // Setters - Getters
 
-float TrackerStimulator::getX() const
+float TrackingStimulator::getX() const
 {
     return m_x;
 }
-float TrackerStimulator::getY() const
+float TrackingStimulator::getY() const
 {
     return m_y;
 }
-float TrackerStimulator::getWidth() const
+float TrackingStimulator::getWidth() const
 {
     return m_width;
 }
-float TrackerStimulator::getHeight() const
+float TrackingStimulator::getHeight() const
 {
     return m_height;
 }
 
-bool TrackerStimulator::getSimulateTrajectory() const
+bool TrackingStimulator::getSimulateTrajectory() const
 {
     return m_simulateTrajectory;
 }
 
-void TrackerStimulator::setSimulateTrajectory(bool sim)
+void TrackingStimulator::setSimulateTrajectory(bool sim)
 {
     m_simulateTrajectory = sim;
 }
 
-vector<Circle> TrackerStimulator::getCircles()
+vector<Circle> TrackingStimulator::getCircles()
 {
     return m_circles;
 }
-void TrackerStimulator::addCircle(Circle c)
+void TrackingStimulator::addCircle(Circle c)
 {
     m_circles.push_back(c);
 }
-void TrackerStimulator::editCircle(int ind, float x, float y, float rad, bool on)
+void TrackingStimulator::editCircle(int ind, float x, float y, float rad, bool on)
 {
     m_circles[ind].set(x,y,rad,on);
 }
-void TrackerStimulator::deleteCircle(int ind)
+void TrackingStimulator::deleteCircle(int ind)
 {
     m_circles.erase(m_circles.begin() + ind);
 }
-void TrackerStimulator::disableCircles()
+void TrackingStimulator::disableCircles()
 {
     for(int i=0; i<m_circles.size(); i++)
         m_circles[i].off();
 }
 
-int TrackerStimulator::getSelectedCircle() const
+int TrackingStimulator::getSelectedCircle() const
 {
     return m_selectedCircle;
 }
-void TrackerStimulator::setSelectedCircle(int ind)
+void TrackingStimulator::setSelectedCircle(int ind)
 {
     m_selectedCircle = ind;
 }
 
-int TrackerStimulator::getChan() const
+int TrackingStimulator::getChan() const
 {
     return m_chan;
 }
 
 
-float TrackerStimulator::getStimFreq(int chan) const
+float TrackingStimulator::getStimFreq(int chan) const
 {
     return m_stimFreq[chan];
 }
-float TrackerStimulator::getStimSD(int chan) const
+float TrackingStimulator::getStimSD(int chan) const
 {
     return m_stimSD[chan];
 }
-bool TrackerStimulator::getIsUniform(int chan) const
+bool TrackingStimulator::getIsUniform(int chan) const
 {
     if (m_isUniform[chan])
         return true;
     else
         return false;
 }
-bool TrackerStimulator::getIsBiphasic(int chan) const
+bool TrackingStimulator::getIsBiphasic(int chan) const
 {
     if (m_isBiphasic[chan])
         return true;
     else
         return false;
 }
-bool TrackerStimulator::getNegFirst(int chan) const
+bool TrackingStimulator::getNegFirst(int chan) const
 {
     if (m_negativeFirst[chan])
         return true;
     else
         return false;
 }
-float TrackerStimulator::getPhaseDuration(int chan) const
+float TrackingStimulator::getPhaseDuration(int chan) const
 {
     return m_phaseDuration[chan];
 }
-float TrackerStimulator::getInterPhaseInt(int chan) const
+float TrackingStimulator::getInterPhaseInt(int chan) const
 {
     return m_interPhaseInt[chan];
 }
-float TrackerStimulator::getVoltage(int chan) const
+float TrackingStimulator::getVoltage(int chan) const
 {
     return m_voltage[chan];
 }
-int TrackerStimulator::getRepetitions(int chan) const
+int TrackingStimulator::getRepetitions(int chan) const
 {
     return m_repetitions[chan];
 }
-float TrackerStimulator::getInterPulseInt(int chan) const
+float TrackingStimulator::getInterPulseInt(int chan) const
 {
     return m_interPulseInt[chan];
 }
-float TrackerStimulator::getTrainDuration(int chan) const
+float TrackingStimulator::getTrainDuration(int chan) const
 {
     return m_trainDuration[chan];
 }
 
-uint32_t TrackerStimulator::getPulsePalVersion() const
+uint32_t TrackingStimulator::getPulsePalVersion() const
 {
     return m_pulsePalVersion;
 }
 
-void TrackerStimulator::setStimFreq(int chan, float stimFreq)
+void TrackingStimulator::setStimFreq(int chan, float stimFreq)
 {
     m_stimFreq[chan] = stimFreq;
 }
-void TrackerStimulator::setStimSD(int chan, float stimSD)
+void TrackingStimulator::setStimSD(int chan, float stimSD)
 {
     m_stimSD[chan] = stimSD;
 }
-void TrackerStimulator::setIsUniform(int chan, bool isUniform)
+void TrackingStimulator::setIsUniform(int chan, bool isUniform)
 {
     if (isUniform)
         m_isUniform[chan] = 1;
     else
         m_isUniform[chan] = 0;
 }
-void TrackerStimulator::setIsBiphasic(int chan, bool isBiphasic)
+void TrackingStimulator::setIsBiphasic(int chan, bool isBiphasic)
 {
     if (isBiphasic)
         m_isBiphasic[chan] = 1;
     else
         m_isBiphasic[chan] = 0;
 }
-void TrackerStimulator::setNegFirst(int chan, bool negFirst)
+void TrackingStimulator::setNegFirst(int chan, bool negFirst)
 {
     if (negFirst)
         m_negativeFirst[chan] = 1;
@@ -233,53 +233,53 @@ void TrackerStimulator::setNegFirst(int chan, bool negFirst)
         m_negativeFirst[chan] = 0;
 
 }
-void TrackerStimulator::setPhaseDuration(int chan, float phaseDuration)
+void TrackingStimulator::setPhaseDuration(int chan, float phaseDuration)
 {
     m_phaseDuration[chan] = phaseDuration;
     //    updatePulsePal();
 }
-void TrackerStimulator::setInterPhaseInt(int chan, float interPhaseInt)
+void TrackingStimulator::setInterPhaseInt(int chan, float interPhaseInt)
 {
     m_interPhaseInt[chan] = interPhaseInt;
     //    updatePulsePal();
 }
-void TrackerStimulator::setVoltage(int chan, float voltage)
+void TrackingStimulator::setVoltage(int chan, float voltage)
 {
     m_voltage[chan] = voltage;
     //    updatePulsePal();
 }
-void TrackerStimulator::setRepetitions(int chan, int rep)
+void TrackingStimulator::setRepetitions(int chan, int rep)
 {
     m_repetitions[chan] = rep;
     //    updatePulsePal();
 }
-void TrackerStimulator::setInterPulseInt(int chan, float interPulseInt)
+void TrackingStimulator::setInterPulseInt(int chan, float interPulseInt)
 {
     m_interPulseInt[chan] = interPulseInt;
     //    updatePulsePal();
 }
-void TrackerStimulator::setTrainDuration(int chan, float trainDuration)
+void TrackingStimulator::setTrainDuration(int chan, float trainDuration)
 {
     m_trainDuration[chan] = trainDuration;
     //    updatePulsePal();
 }
 
-void TrackerStimulator::setChan(int chan)
+void TrackingStimulator::setChan(int chan)
 {
     m_chan = chan;
 }
 
-void TrackerStimulator::setStimSyncChan(int chan)
+void TrackingStimulator::setStimSyncChan(int chan)
 {
     m_StimSyncChan = chan;
 }
 
-void TrackerStimulator::setTTLSyncChan(int chan)
+void TrackingStimulator::setTTLSyncChan(int chan)
 {
     m_TTLSyncChan = chan;
 }
 
-bool TrackerStimulator::checkParameterConsistency(int chan)
+bool TrackingStimulator::checkParameterConsistency(int chan)
 {
     if (m_repetitions[chan] > 1)
         if (!m_isBiphasic[chan])
@@ -302,7 +302,7 @@ bool TrackerStimulator::checkParameterConsistency(int chan)
     }
 }
 
-void TrackerStimulator::setRepetitionsTrainDuration(int chan, priority whatFirst)
+void TrackingStimulator::setRepetitionsTrainDuration(int chan, priority whatFirst)
 {
     if (whatFirst == REPFIRST)
     {
@@ -338,11 +338,12 @@ void TrackerStimulator::setRepetitionsTrainDuration(int chan, priority whatFirst
     }
 }
 
-void TrackerStimulator::process(AudioSampleBuffer& buffer, MidiBuffer& events)
+void TrackingStimulator::process(AudioSampleBuffer&)
 {
-    setTimestamp(events,CoreServices::getGlobalTimestamp());
     if (!m_simulateTrajectory)
-        checkForEvents(events);
+    {
+        checkForEvents();
+    }
     else
     {
         // simulate events at 60Hz
@@ -429,53 +430,60 @@ void TrackerStimulator::process(AudioSampleBuffer& buffer, MidiBuffer& events)
     }
 }
 
-void TrackerStimulator::handleEvent(int eventType, MidiMessage &event, int samplePosition)
+// TODO make use of TrackingData
+void TrackingStimulator::handleEvent (const EventChannel* eventInfo, const MidiMessage& event, int)
 {
-    // Get current position
-    if(eventType == BINARY_MSG) {
-        const uint8* rawData = event.getRawData();
-        if(event.getRawDataSize() != 6 + sizeof(float)*4 + sizeof(int64)) {
-            cout << "Position tracker got wrong event size x,y,width,height was expected: " << event.getRawDataSize() << endl;
-        }
-        const float* message = (float*)(rawData+6+sizeof(int64));
-
-        if(!(message[0] != message[0] || message[1] != message[1]) && message[0] != 0 && message[1] != 0)
-        {
-            m_x = message[0];
-            m_y = message[1];
-        }
-        if(!(message[2] != message[2] || message[3] != message[3]))
-        {
-            m_width = message[2];
-            m_height = message[3];
-            m_aspect_ratio = m_width / m_height;
-        }
-        m_positionIsUpdated = true;
-    }
-
-    // Sync!
-    if (eventType == TTL)
+    if ((eventInfo->getName()).compare("Tracking data") != 0)
     {
-        //  std::cout << "Received an event!" << std::endl;
-
-        const uint8* dataptr = event.getRawData();
-
-        // int eventNodeId = *(dataptr+1);
-        const int eventId       = *(dataptr + 2);
-        const int eventChannel  = *(dataptr + 3);
-
-        if (eventId == 1
-                && eventChannel == m_TTLSyncChan)
-        {
-            syncStimulation(m_StimSyncChan);
-            CoreServices::sendStatusMessage("Sent trigger sync event!");
-        }
+        return;
     }
 
+    BinaryEventPtr evtptr = BinaryEvent::deserializeFromMessage(event, eventInfo);
 
+    if(event.getRawDataSize() != sizeof(TrackingData) + 18) { // TODO figure out why it is + 18
+        cout << "Position tracker got wrong event size x,y,width,height was expected: " << event.getRawDataSize() << endl;
+        return;
+    }
+
+//    const auto* rawData = (uint8*) evtptr->getBinaryDataPointer();
+    auto nodeId = evtptr->getSourceID();
+//    const int64 timestamp = *(rawData);
+//    const float* message = (float*)(rawData+sizeof(int64));
+    const auto *message = reinterpret_cast<const TrackingData *>(evtptr->getBinaryDataPointer());
+
+    TrackingPosition position = message->position;
+
+    if(!(position.x != position.x || position.y != position.y) && position.x != 0 && position.y != 0)
+    {
+        m_x = position.x;
+        m_y = position.y;
+    }
+    if(!(position.width != position.width || position.height != position.height))
+    {
+        m_width = position.width;
+        m_height = position.height;
+        m_aspect_ratio = m_width / m_height;
+    }
+    m_positionIsUpdated = true;
+
+    // Sync
+    if (eventInfo->getChannelType() == EventChannel::TTL) // && eventInfo == eventChannelArray[triggerEvent])
+    {
+        TTLEventPtr ttl = TTLEvent::deserializeFromMessage(event, eventInfo);
+        int eventId = ttl->getState() ? 1 : 0;
+
+        std::cout << "In tracker stim" << std::endl;
+        if (ttl->getChannel() ==  m_TTLSyncChan && eventId == 1)
+        {
+            {
+                syncStimulation(m_StimSyncChan);
+                CoreServices::sendStatusMessage("Sent trigger sync event!");
+            }
+        }
+    }
 }
 
-int TrackerStimulator::isPositionWithinCircles(float x, float y)
+int TrackingStimulator::isPositionWithinCircles(float x, float y)
 {
     int whichCircle = -1;
     for (int i = 0; i < m_circles.size(); i++)
@@ -486,7 +494,7 @@ int TrackerStimulator::isPositionWithinCircles(float x, float y)
     return whichCircle;
 }
 
-bool TrackerStimulator::stimulate()
+bool TrackingStimulator::stimulate()
 {
     if (isPositionWithinCircles(m_x, m_y) != -1)
         return true;
@@ -494,20 +502,20 @@ bool TrackerStimulator::stimulate()
         return false;
 }
 
-bool TrackerStimulator::positionDisplayedIsUpdated() const
+bool TrackingStimulator::positionDisplayedIsUpdated() const
 {
     //return m_positionDisplayedIsUpdated;
     return m_positionIsUpdated;
 }
 
-void TrackerStimulator::clearPositionDisplayedUpdated()
+void TrackingStimulator::clearPositionDisplayedUpdated()
 {
     //m_positionDisplayedIsUpdated = false;
     m_positionIsUpdated = false;
 }
 
 
-bool TrackerStimulator::updatePulsePal()
+bool TrackingStimulator::updatePulsePal()
 {
     // check that Pulspal is connected and update param
     if (m_pulsePalVersion != 0)
@@ -560,7 +568,7 @@ bool TrackerStimulator::updatePulsePal()
         return false;
 }
 
-bool TrackerStimulator::testStimulation(){
+bool TrackingStimulator::testStimulation(){
 
     // check that Pulspal is connected and update param
     if (m_pulsePalVersion > 0)
@@ -576,7 +584,7 @@ bool TrackerStimulator::testStimulation(){
 
 } //test from Editor
 
-bool TrackerStimulator::syncStimulation(int chan)
+bool TrackingStimulator::syncStimulation(int chan)
 {
     if (m_pulsePalVersion > 0)
     {
@@ -605,26 +613,26 @@ bool TrackerStimulator::syncStimulation(int chan)
 }
 
 
-void TrackerStimulator::startStimulation()
+void TrackingStimulator::startStimulation()
 {
     m_isOn = true;
 
 }
 
-void TrackerStimulator::stopStimulation()
+void TrackingStimulator::stopStimulation()
 {
     m_isOn = false;
 }
 
-bool TrackerStimulator::isReady()
+bool TrackingStimulator::isReady()
 {
     return true;
 }
 
-bool TrackerStimulator::saveParametersXml()
+bool TrackingStimulator::saveParametersXml()
 {
     //Save
-    XmlElement* state = new XmlElement("TRACKERSTIMULATOR");
+    XmlElement* state = new XmlElement("TrackingSTIMULATOR");
 
     // save circles
     XmlElement* circles = new XmlElement("CIRCLES");
@@ -672,14 +680,14 @@ bool TrackerStimulator::saveParametersXml()
 
 }
 
-bool TrackerStimulator::loadParametersXml(File fileToLoad)
+bool TrackingStimulator::loadParametersXml(File fileToLoad)
 {
     File currentFile = fileToLoad;
 
     XmlDocument doc(currentFile);
     XmlElement* xml = doc.getDocumentElement();
 
-    if (xml == 0 || ! xml->hasTagName("TRACKERSTIMULATOR"))
+    if (xml == 0 || ! xml->hasTagName("TrackingSTIMULATOR"))
     {
         std::cout << "File not found." << std::endl;
         delete xml;
@@ -747,7 +755,7 @@ bool TrackerStimulator::loadParametersXml(File fileToLoad)
     }
 }
 
-void TrackerStimulator::save()
+void TrackingStimulator::save()
 {
     if (currentConfigFile.exists())
     {
@@ -773,7 +781,7 @@ void TrackerStimulator::save()
     }
 }
 
-void TrackerStimulator::saveAs()
+void TrackingStimulator::saveAs()
 {
     FileChooser fc("Choose the file name...",
                    File::getCurrentWorkingDirectory(),
@@ -791,7 +799,7 @@ void TrackerStimulator::saveAs()
     }
 }
 
-void TrackerStimulator::load()
+void TrackingStimulator::load()
 {
     FileChooser fc("Choose the file name...",
                    File::getCurrentWorkingDirectory(),
@@ -809,9 +817,9 @@ void TrackerStimulator::load()
     }
 }
 
-void TrackerStimulator::saveCustomParametersToXml(XmlElement *parentElement)
+void TrackingStimulator::saveCustomParametersToXml(XmlElement *parentElement)
 {
-    XmlElement* mainNode = parentElement->createNewChildElement("TRACKERSTIMULATOR");
+    XmlElement* mainNode = parentElement->createNewChildElement("TrackingSTIMULATOR");
     // save circles
     XmlElement* circles = new XmlElement("CIRCLES");
     for (int i=0; i<m_circles.size(); i++)
@@ -851,13 +859,13 @@ void TrackerStimulator::saveCustomParametersToXml(XmlElement *parentElement)
 
 }
 
-void TrackerStimulator::loadCustomParametersFromXml()
+void TrackingStimulator::loadCustomParametersFromXml()
 {
     if (parametersAsXml != nullptr)
     {
         forEachXmlChildElement(*parametersAsXml, mainNode)
         {
-            if (mainNode->hasTagName("TRACKERSTIMULATOR"))
+            if (mainNode->hasTagName("TrackingSTIMULATOR"))
             {
                 forEachXmlChildElement(*mainNode, element)
                 {

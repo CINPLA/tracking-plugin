@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 
-    TrackerStimulatorCanvas.cpp
+    TrackingStimulatorCanvas.cpp
     Created: 26 jun 2016
     Author:  alessio
 
@@ -9,12 +9,12 @@
 */
 
 
-#include "TrackerStimulatorCanvas.h"
-#include "TrackerStimulator.h"
+#include "TrackingStimulatorCanvas.h"
+#include "TrackingStimulator.h"
 
 
-TrackerStimulatorCanvas::TrackerStimulatorCanvas(TrackerStimulator* trackerStimulator)
-    : processor(trackerStimulator)
+TrackingStimulatorCanvas::TrackingStimulatorCanvas(TrackingStimulator* TrackingStimulator)
+    : processor(TrackingStimulator)
     , m_x(0.5)
     , m_y(0.5)
     , m_width(1.0)
@@ -35,23 +35,23 @@ TrackerStimulatorCanvas::TrackerStimulatorCanvas(TrackerStimulator* trackerStimu
 
     addKeyListener(this);
 
-    m_ax = new DisplayAxes(trackerStimulator, this);
+    m_ax = new DisplayAxes(TrackingStimulator, this);
 
     startCallbacks();
     update();
 }
 
-TrackerStimulatorCanvas::~TrackerStimulatorCanvas()
+TrackingStimulatorCanvas::~TrackingStimulatorCanvas()
 {
     TopLevelWindow::getTopLevelWindow(0)->removeKeyListener(this);
 }
 
-float TrackerStimulatorCanvas::my_round(float x)
+float TrackingStimulatorCanvas::my_round(float x)
 {
     return x < 0.0 ? ceil(x - 0.5) : floor(x + 0.5);
 }
 
-bool TrackerStimulatorCanvas::areThereCicles()
+bool TrackingStimulatorCanvas::areThereCicles()
 {
     if (processor->getCircles().size()>0)
         return true;
@@ -59,7 +59,7 @@ bool TrackerStimulatorCanvas::areThereCicles()
         return false;
 }
 
-void TrackerStimulatorCanvas::paint (Graphics& g)
+void TrackingStimulatorCanvas::paint (Graphics& g)
 {
     if(m_x != m_x || m_y != m_y || m_width != m_width || m_height != m_height)
     { // is it nan?
@@ -97,7 +97,7 @@ void TrackerStimulatorCanvas::paint (Graphics& g)
 
 }
 
-void TrackerStimulatorCanvas::resized()
+void TrackingStimulatorCanvas::resized()
 {
     m_ax->setBounds(int(0.01*getHeight()), int(0.01*getHeight()), int(0.98*getHeight()), int(0.98*getHeight()));
     addAndMakeVisible(m_ax);
@@ -181,7 +181,7 @@ void TrackerStimulatorCanvas::resized()
 }
 
 
-bool TrackerStimulatorCanvas::keyPressed(const KeyPress &key, Component *originatingComponent)
+bool TrackingStimulatorCanvas::keyPressed(const KeyPress &key, Component *originatingComponent)
 {
     //copy/paste of circles
     KeyPress ctrlC = KeyPress (99, ModifierKeys::ctrlModifier, (juce_wchar) 'c');
@@ -199,7 +199,7 @@ bool TrackerStimulatorCanvas::keyPressed(const KeyPress &key, Component *origina
     return false;
 }
 
-void TrackerStimulatorCanvas::buttonClicked(Button* button)
+void TrackingStimulatorCanvas::buttonClicked(Button* button)
 {
     if (button == clearButton)
     {
@@ -643,7 +643,7 @@ void TrackerStimulatorCanvas::buttonClicked(Button* button)
 
 }
 
-void TrackerStimulatorCanvas::uploadInfoOnLoad()
+void TrackingStimulatorCanvas::uploadInfoOnLoad()
 {
     // circle buttons visible
     for (int i = 0; i<MAX_CIRCLES; i++)
@@ -786,7 +786,7 @@ void TrackerStimulatorCanvas::uploadInfoOnLoad()
 
 }
 
-void TrackerStimulatorCanvas::labelTextChanged(Label *label)
+void TrackingStimulatorCanvas::labelTextChanged(Label *label)
 {
     // Instance a new circle only when the add new button is clicked
     if (label == cxEditLabel)
@@ -986,15 +986,15 @@ void TrackerStimulatorCanvas::labelTextChanged(Label *label)
 }
 
 
-void TrackerStimulatorCanvas::refreshState()
+void TrackingStimulatorCanvas::refreshState()
 {
 }
 
-void TrackerStimulatorCanvas::update()
+void TrackingStimulatorCanvas::update()
 {
 }
 
-void TrackerStimulatorCanvas::refresh()
+void TrackingStimulatorCanvas::refresh()
 {
     if(processor->positionDisplayedIsUpdated()) {
         processor->clearPositionDisplayedUpdated();
@@ -1008,17 +1008,17 @@ void TrackerStimulatorCanvas::refresh()
     }
 }
 
-void TrackerStimulatorCanvas::beginAnimation()
+void TrackingStimulatorCanvas::beginAnimation()
 {
     startCallbacks();
 }
 
-void TrackerStimulatorCanvas::endAnimation()
+void TrackingStimulatorCanvas::endAnimation()
 {
     stopCallbacks();
 }
 
-void TrackerStimulatorCanvas::initButtons()
+void TrackingStimulatorCanvas::initButtons()
 {
 
     clearButton = new UtilityButton("Clear plot", Font("Small Text", 13, Font::plain));
@@ -1154,7 +1154,7 @@ void TrackerStimulatorCanvas::initButtons()
 
 }
 
-void TrackerStimulatorCanvas::initLabels()
+void TrackingStimulatorCanvas::initLabels()
 {
     // Static Labels
     cxLabel = new Label("s_cx", "xpos [%]:");
@@ -1330,7 +1330,7 @@ void TrackerStimulatorCanvas::initLabels()
 }
 
 
-void TrackerStimulatorCanvas::clear()
+void TrackingStimulatorCanvas::clear()
 {
     // set all circles to off
     processor->disableCircles();
@@ -1338,33 +1338,33 @@ void TrackerStimulatorCanvas::clear()
     repaint();
 }
 
-bool TrackerStimulatorCanvas::getUpdateCircle(){
+bool TrackingStimulatorCanvas::getUpdateCircle(){
     return m_updateCircle;
 }
-void TrackerStimulatorCanvas::setUpdateCircle(bool onoff){
+void TrackingStimulatorCanvas::setUpdateCircle(bool onoff){
     m_updateCircle = onoff;
 }
 
-void TrackerStimulatorCanvas::setOnButton()
+void TrackingStimulatorCanvas::setOnButton()
 {
     m_onoff = true;
 }
 
 
-void TrackerStimulatorCanvas::setParameter(int, float)
+void TrackingStimulatorCanvas::setParameter(int, float)
 {
 }
 
-void TrackerStimulatorCanvas::setParameter(int, int, int, float)
+void TrackingStimulatorCanvas::setParameter(int, int, int, float)
 {
 }
 
 
 // DisplayAxes methods
 
-DisplayAxes::DisplayAxes(TrackerStimulator* trackerStimulator, TrackerStimulatorCanvas* trackerStimulatorCanvas)
-    : processor(trackerStimulator)
-    , canvas(trackerStimulatorCanvas)
+DisplayAxes::DisplayAxes(TrackingStimulator* TrackingStimulator, TrackingStimulatorCanvas* TrackingStimulatorCanvas)
+    : processor(TrackingStimulator)
+    , canvas(TrackingStimulatorCanvas)
     , selectedCircleColour(Colour(255,155,30))
     , unselectedCircleColour(Colour(200,255,30))
     , backgroundColour(Colour(0,18,43))

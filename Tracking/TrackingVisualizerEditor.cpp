@@ -1,47 +1,47 @@
 /*
   ==============================================================================
 
-    PositionTrackerEditor.cpp
+    TrackingVisualizerEditor.cpp
     Created: 5 Oct 2015 11:35:12am
     Author:  mikkel
 
   ==============================================================================
 */
 
-#include "PositionTrackerEditor.h"
-#include "PositionTrackerCanvas.h"
-#include "PositionTracker.h"
+#include "TrackingVisualizerEditor.h"
+#include "TrackingVisualizerCanvas.h"
+#include "TrackingVisualizer.h"
 
 //==============================================================================
-PositionTrackerEditor::PositionTrackerEditor(GenericProcessor* parentNode, bool useDefaultParameterEditors=true)
+TrackingVisualizerEditor::TrackingVisualizerEditor(GenericProcessor* parentNode, bool useDefaultParameterEditors=true)
     : VisualizerEditor(parentNode, useDefaultParameterEditors)
 {
     tabText = "Tracking";
     desiredWidth = 180;
 }
 
-PositionTrackerEditor::~PositionTrackerEditor()
+TrackingVisualizerEditor::~TrackingVisualizerEditor()
 {
     deleteAllChildren();
 }
 
-Visualizer* PositionTrackerEditor::createNewCanvas()
+Visualizer* TrackingVisualizerEditor::createNewCanvas()
 {
-    PositionTracker* processor = (PositionTracker*) getProcessor();
-    return new PositionTrackerCanvas(processor);
+    TrackingVisualizer* processor = (TrackingVisualizer*) getProcessor();
+    return new TrackingVisualizerCanvas(processor);
 }
 
-//void PositionTrackerEditor::saveCustomParameters(XmlElement *parentElement)
+//void TrackingVisualizerEditor::saveCustomParameters(XmlElement *parentElement)
 //{
 
 //}
 
-//void PositionTrackerEditor::loadCustomParameters(XmlElement *parametersAsXml)
+//void TrackingVisualizerEditor::loadCustomParameters(XmlElement *parametersAsXml)
 //{
 
 //}
 
-void PositionTrackerEditor::initializeButtons()
+void TrackingVisualizerEditor::initializeButtons()
 {
     int w = 18;
     int h = 18;
@@ -61,7 +61,7 @@ void PositionTrackerEditor::initializeButtons()
 
 }
 
-void PositionTrackerEditor::buttonCallback(Button* button)
+void TrackingVisualizerEditor::buttonCallback(Button* button)
 {
     int gId = button->getRadioGroupId();
 

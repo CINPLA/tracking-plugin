@@ -1,26 +1,26 @@
 /*
   ==============================================================================
 
-    PositionTrackerEditor.h
+    TrackingVisualizerEditor.h
     Created: 5 Oct 2015 11:35:12am
     Author:  mikkel
 
   ==============================================================================
 */
 
-#ifndef POSITIONTRACKEREDITOR_H_INCLUDED
-#define POSITIONTRACKEREDITOR_H_INCLUDED
+#ifndef TRACKINGVISUALIZEREDITOR_H_INCLUDED
+#define TRACKINGVISUALIZEREDITOR_H_INCLUDED
 
 #include <VisualizerEditorHeaders.h>
 
 //==============================================================================
 /*
 */
-class PositionTrackerEditor : public VisualizerEditor
+class TrackingVisualizerEditor : public VisualizerEditor
 {
 public:
-    PositionTrackerEditor(GenericProcessor* parentNode, bool useDefaultParameterEditors);
-    ~PositionTrackerEditor();
+    TrackingVisualizerEditor(GenericProcessor* parentNode, bool useDefaultParameterEditors);
+    ~TrackingVisualizerEditor();
 
     void buttonCallback(Button* button);
 
@@ -32,9 +32,9 @@ public:
 private:
     UtilityButton* clearBtn;
     void initializeButtons();
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PositionTrackerEditor);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TrackingVisualizerEditor);
 
 };
 
 
-#endif  // POSITIONTRACKEREDITOR_H_INCLUDED
+#endif  // TRACKINGVISUALIZEREDITOR_H_INCLUDED
