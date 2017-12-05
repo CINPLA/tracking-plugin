@@ -1,8 +1,17 @@
 /*
     ------------------------------------------------------------------
 
-    This file is part of the Open Ephys GUI
-    Copyright (C) 2014 Open Ephys
+    This file is part of the Tracking plugin for the Open Ephys GUI
+    Written by:
+
+    Alessio Buccino     alessiob@ifi.uio.no
+    Mikkel Lepperod
+    Svenn-Arne Dragly
+
+    Center for Integrated Neuroplasticity CINPLA
+    Department of Biosciences
+    University of Oslo
+    Norway
 
     ------------------------------------------------------------------
 
@@ -18,7 +27,6 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 */
 
 #ifndef TRACKINGNODEEDITOR_H
@@ -27,29 +35,41 @@
 
 #include <EditorHeaders.h>
 
-class TrackingNodeEditor : public GenericEditor, public Label::Listener
+class TrackingNodeEditor :
+        public GenericEditor,
+        public Label::Listener,
+        public ComboBox::Listener
 {
 public:
     TrackingNodeEditor (GenericProcessor* parentNode, bool useDefaultParameterEditors);
     virtual ~TrackingNodeEditor();
 
+    virtual void labelTextChanged (Label* labelThatHasChanged) override;
+    void buttonEvent(Button* button);
+    virtual void comboBoxChanged (ComboBox* c) override;
+
+    virtual void updateSettings();
+    void updateLabels();
+
 private:
+    ScopedPointer<ComboBox> sourceSelector;
+    ScopedPointer<UtilityButton> plusButton;
+    ScopedPointer<UtilityButton> minusButton;
+    int selectedSource;
+
+    void addTrackingSource();
+    void removeTrackingSource();
+
     ScopedPointer<Label> positionLabel;
     ScopedPointer<Label> labelPort;
-    ScopedPointer<Label> urlLabel;
+    ScopedPointer<Label> portLabel;
     ScopedPointer<Label> labelAdr;
     ScopedPointer<Label> adrLabel;
+    ScopedPointer<Label> labelColor;
+    ScopedPointer<Label> colorLabel;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TrackingNodeEditor);
 
-
-    // Listener interface
-public:
-    virtual void labelTextChanged (Label* labelThatHasChanged) override;
-
-    // GenericEditor interface
-public:
-    void saveCustomParameters (XmlElement* parentElement) override;
-    void loadCustomParameters (XmlElement* parametersAsXml) override;
 };
 
 

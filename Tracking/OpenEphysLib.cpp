@@ -48,27 +48,27 @@ extern "C" EXPORT int getPluginInfo (int index, Plugin::PluginInfo* info)
 {
     switch (index)
     {
-        case 0:
-            info->type = Plugin::PLUGIN_TYPE_PROCESSOR;
-            info->processor.name = "Tracking Port";
-            info->processor.type = Plugin::SourceProcessor;
-            info->processor.creator = & (Plugin::createProcessor<TrackingNode>);
-            break;
-        case 1:
-            info->type = Plugin::PLUGIN_TYPE_PROCESSOR;
-            info->processor.name = "Tracking Visual";
-            info->processor.type = Plugin::SinkProcessor;
-            info->processor.creator = & (Plugin::createProcessor<TrackingVisualizer>);
-            break;
-        case 2:
-            info->type = Plugin::PLUGIN_TYPE_PROCESSOR;
-            info->processor.name = "Tracking Stim";
-            info->processor.type = Plugin::SinkProcessor;
-            info->processor.creator = & (Plugin::createProcessor<TrackingStimulator>);
-            break;
-        default:
-            return -1;
-            break;
+    case 0:
+        info->type = Plugin::PLUGIN_TYPE_PROCESSOR;
+        info->processor.name = "Tracking Port";
+        info->processor.type = Plugin::SourceProcessor;
+        info->processor.creator = & (Plugin::createProcessor<TrackingNode>);
+        break;
+    case 1:
+        info->type = Plugin::PLUGIN_TYPE_PROCESSOR;
+        info->processor.name = "Tracking Stim";
+        info->processor.type = Plugin::FilterProcessor;
+        info->processor.creator = & (Plugin::createProcessor<TrackingStimulator>);
+        break;
+    case 2:
+        info->type = Plugin::PLUGIN_TYPE_PROCESSOR;
+        info->processor.name = "Tracking Visual";
+        info->processor.type = Plugin::SinkProcessor;
+        info->processor.creator = & (Plugin::createProcessor<TrackingVisualizer>);
+        break;
+    default:
+        return -1;
+        break;
     }
 
     return 0;

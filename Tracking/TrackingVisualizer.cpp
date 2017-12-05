@@ -1,27 +1,45 @@
 /*
-  ==============================================================================
+    ------------------------------------------------------------------
 
-    TrackingVisualizer.cpp
-    Created: 5 Oct 2015 11:34:58am
-    Author:  mikkel
+    This file is part of the Tracking plugin for the Open Ephys GUI
+    Written by:
 
-  ==============================================================================
+    Alessio Buccino     alessiob@ifi.uio.no
+    Mikkel Lepperod
+    Svenn-Arne Dragly
+
+    Center for Integrated Neuroplasticity CINPLA
+    Department of Biosciences
+    University of Oslo
+    Norway
+
+    ------------------------------------------------------------------
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "TrackingVisualizer.h"
 #include "TrackingVisualizerEditor.h"
 
-using std::cout;
-using std::endl;
 #include <algorithm>
 
-//==============================================================================
 TrackingVisualizer::TrackingVisualizer()
     : GenericProcessor("Tracking Visual")
     , m_positionIsUpdated(false)
-    , m_sources(0)
     , m_clearTracking(false)
     , m_isRecording(false)
+    , m_colorUpdated(false)
 {
     setProcessorType (PROCESSOR_TYPE_SINK);
 }
@@ -34,6 +52,30 @@ AudioProcessorEditor *TrackingVisualizer::createEditor()
 {
     editor = new TrackingVisualizerEditor(this, true);
     return editor;
+}
+
+void TrackingVisualizer::updateSettings()
+{
+    sources.clear();
+    TrackingSources s;
+    int nEvents = getTotalEventChannels();
+    for (int i = 0; i < nEvents; i++)
+    {
+        const EventChannel* event = getEventChannel(i);
+        if (event->getName().compare("Tracking data") == 0)
+        {
+            s.eventIndex = event->getSourceIndex();
+            s.sourceId =  event->getSourceNodeID();
+            s.name = event->getName() + " " + String(event->getSourceIndex()+1);
+            s.color = "None";
+            s.x_pos = -1;
+            s.y_pos = -1;
+            s.width = -1;
+            s.height = -1;
+            sources.add (s);
+            m_colorUpdated = true;
+        }
+    }
 }
 
 void TrackingVisualizer::process(AudioSampleBuffer &)
@@ -58,47 +100,36 @@ void TrackingVisualizer::handleEvent (const EventChannel* eventInfo, const MidiM
 
     BinaryEventPtr evtptr = BinaryEvent::deserializeFromMessage(event, eventInfo);
 
-    if(event.getRawDataSize() != sizeof(TrackingData) + 18) { // TODO figure out why it is + 18
-        cout << "Position tracker got wrong event size x,y,width,height was expected: " << event.getRawDataSize() << endl;
-        return;
-    }
-
-//    const auto* rawData = (uint8*) evtptr->getBinaryDataPointer();
-    auto nodeId = evtptr->getSourceID();
-//    const int64 timestamp = *(rawData);
-//    const float* message = (float*)(rawData+sizeof(int64));
+    int nodeId = evtptr->getSourceID();
+    int evtId = evtptr->getSourceIndex();
     const auto *message = reinterpret_cast<const TrackingData *>(evtptr->getBinaryDataPointer());
 
-    std::vector<uint8>::iterator pos = find(m_ids.begin(), m_ids.end(), nodeId);
+    int nSources = sources.size ();
 
-    if (pos == m_ids.end())
+    for (int i = 0; i < nSources; i++)
     {
+        TrackingSources& currentSource = sources.getReference (i);
+        if (currentSource.sourceId == nodeId && evtId == currentSource.eventIndex)
+        {
+            if(!(message->position.x != message->position.x || message->position.y != message->position.y) && message->position.x != 0 && message->position.y != 0)
+            {
+                currentSource.x_pos = message->position.x;
+                currentSource.y_pos = message->position.y;
+            }
+            if(!(message->position.width != message->position.width || message->position.height != message->position.height))
+            {
+                currentSource.width = message->position.width;
+                currentSource.height = message->position.height;
+            }
 
-        if(!(message->position.x != message->position.x || message->position.y != message->position.y) && message->position.x != 0 && message->position.y != 0)
-        {
-            m_sources++;
-            m_ids.push_back(nodeId);
-            m_x.push_back(message->position.x);
-            m_y.push_back(message->position.y);
-        }
-        if(!(message->position.width != message->position.width || message->position.height != message->position.height))
-        {
-            m_width.push_back(message->position.width);
-            m_height.push_back(message->position.height);
-        }
-    }
-    else
-    {
-        auto idx = std::distance(m_ids.begin(),  pos) ;
-        if(!(message->position.x != message->position.x || message->position.y != message->position.y) && message->position.x != 0 && message->position.y != 0)
-        {
-            m_x[idx] = message->position.x;
-            m_y[idx] = message->position.y;
-        }
-        if(!(message->position.width != message->position.width || message->position.height != message->position.height))
-        {
-            m_width[idx] = message->position.width;
-            m_height[idx] = message->position.height;
+            String sourceColor;
+            evtptr->getMetaDataValue(0)->getValue(sourceColor);
+
+            if (currentSource.color.compare(sourceColor) != 0)
+            {
+                currentSource.color = sourceColor;
+                m_colorUpdated = true;
+            }
         }
     }
 
@@ -106,34 +137,40 @@ void TrackingVisualizer::handleEvent (const EventChannel* eventInfo, const MidiM
 
 }
 
+TrackingSources& TrackingVisualizer::getTrackingSource(int s) const
+{
+    if (s < sources.size())
+        return sources.getReference (s);
+}
+
 
 float TrackingVisualizer::getX(int s) const
 {
-    if (s < m_x.size())
-        return m_x[s];
+    if (s < sources.size())
+        return sources[s].x_pos;
     else
         return -1;
 }
 
 float TrackingVisualizer::getY(int s) const
 {
-    if (s < m_y.size())
-        return m_y[s];
+    if (s < sources.size())
+        return sources[s].y_pos;
     else
         return -1;
 }
 float TrackingVisualizer::getWidth(int s) const
 {
-    if (s < m_width.size())
-        return m_width[s];
+    if (s < sources.size())
+        return sources[s].width;
     else
         return -1;
 }
 
 float TrackingVisualizer::getHeight(int s) const
 {
-    if (s < m_height.size())
-        return m_height[s];
+    if (s < sources.size())
+        return sources[s].height;
     else
         return -1;
 }
@@ -142,14 +179,26 @@ bool TrackingVisualizer::getIsRecording() const
 {
     return m_isRecording;
 }
+
 bool TrackingVisualizer::getClearTracking() const
 {
     return m_clearTracking;
 }
 
+bool TrackingVisualizer::getColorIsUpdated() const
+{
+    return m_colorUpdated;
+}
+
+void TrackingVisualizer::setColorIsUpdated(bool up)
+{
+    m_colorUpdated = up;
+}
+
+
 int TrackingVisualizer::getNSources() const
 {
-    return m_sources;
+    return sources.size ();
 }
 
 void TrackingVisualizer::clearPositionUpdated()

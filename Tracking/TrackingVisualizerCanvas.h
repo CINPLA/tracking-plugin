@@ -1,11 +1,32 @@
 /*
-  ==============================================================================
+    ------------------------------------------------------------------
 
-    TrackingVisualizerCanvas.h
-    Created: 5 Oct 2015 12:09:00pm
-    Author:  mikkel
+    This file is part of the Tracking plugin for the Open Ephys GUI
+    Written by:
 
-  ==============================================================================
+    Alessio Buccino     alessiob@ifi.uio.no
+    Mikkel Lepperod
+    Svenn-Arne Dragly
+
+    Center for Integrated Neuroplasticity CINPLA
+    Department of Biosciences
+    University of Oslo
+    Norway
+
+    ------------------------------------------------------------------
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifndef TRACKINGVISUALIZERCANVAS_H_INCLUDED
@@ -15,26 +36,29 @@
 #include "TrackingVisualizerEditor.h"
 #include "TrackingVisualizer.h"
 #include <vector>
+#include <map>
 
 class TrackingVisualizer;
 
-class Position
+class SourceListBox : public ListBox,
+        public ListBoxModel
 {
+
 public:
-    Position(float xin, float yin, float widthin, float heightin);
-    float x;
-    float y;
-    float width;
-    float height;
+
+    SourceListBox();
+    int getNumRows();
+    void paintListBoxItem (int rowNumber, Graphics& g, int width, int height, bool rowIsSelected);
+    void setData(Array<String> data);
+
+private:
+    Array<String> array;
+
 };
 
-//==============================================================================
-/*
-*/
+
 class TrackingVisualizerCanvas : public Visualizer,
-        public ComboBox::Listener,
-        public Button::Listener,
-        public KeyListener
+        public Button::Listener
 {
 public:
     TrackingVisualizerCanvas(TrackingVisualizer* TrackingVisualizer);
@@ -43,14 +67,9 @@ public:
     void paint (Graphics&);
     void resized();
     void clear();
-    // KeyListener interface
-    virtual bool keyPressed(const KeyPress &key, Component *originatingComponent);
 
-    // Listener interface
+    // Button Listener interface
     virtual void buttonClicked(Button* button);
-
-    // Listener interface
-    virtual void comboBoxChanged(ComboBox *comboBoxThatHasChanged);
 
     // Visualizer interface
     virtual void refreshState();
@@ -62,42 +81,31 @@ public:
     virtual void setParameter(int, int, int, float);
 
 private:
+
     TrackingVisualizer* processor;
     float m_x;
     float m_y;
     float m_width;
     float m_height;
 
-    bool m_prevSet;
-
-    bool m_imgExists;
-    Image rodentImg;
-    int m_img_scale;
-//    float m_curr_rot;
-
+    ScopedPointer<SourceListBox> listbox;
     ScopedPointer<UtilityButton> clearButton;
-    ScopedPointer<UtilityButton> redButton;
-    ScopedPointer<UtilityButton> greenButton;
-    ScopedPointer<UtilityButton> yellowButton;
-    ScopedPointer<UtilityButton> sourcesButton[MAX_SOURCES];
     ScopedPointer<UtilityButton> sameButton;
-
     ScopedPointer<Label> sourcesLabel;
 
-    Colour redColour;
-    Colour greenColour;
-    Colour yellowColour;
-    Colour defaultColour;
-    Colour backgroundColour;
+    std::map<String, Colour> color_palette = {
+        { "red", Colour(200, 30, 30) },
+        { "green", Colour(30, 200, 30) },
+        { "blue", Colour(30, 30, 200) },
+        { "cyan", Colour(30, 200, 200) },
+        { "magenta", Colour(200, 30, 200) },
+        { "yellow", Colour(200, 200, 30) },
+        { "grey", Colour(100, 100, 100) },
+        { "background", Colour(0, 18, 43) }
+    };
 
-    Colour selectedColour;
-    bool m_active[MAX_SOURCES];
-    Colour m_colour[MAX_SOURCES];
-
-    std::vector<Position> m_positions[MAX_SOURCES];
-
+    std::vector<TrackingPosition> m_positions[MAX_SOURCES];
     void initButtonsAndLabels();
-
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TrackingVisualizerCanvas);
 };

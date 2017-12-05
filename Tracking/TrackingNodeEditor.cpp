@@ -1,8 +1,17 @@
 /*
     ------------------------------------------------------------------
 
-    This file is part of the Open Ephys GUI
-    Copyright (C) 2014 Open Ephys
+    This file is part of the Tracking plugin for the Open Ephys GUI
+    Written by:
+
+    Alessio Buccino     alessiob@ifi.uio.no
+    Mikkel Lepperod
+    Svenn-Arne Dragly
+
+    Center for Integrated Neuroplasticity CINPLA
+    Department of Biosciences
+    University of Oslo
+    Norway
 
     ------------------------------------------------------------------
 
@@ -18,7 +27,6 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 */
 
 #include "TrackingNodeEditor.h"
@@ -28,11 +36,41 @@
 
 TrackingNodeEditor::TrackingNodeEditor (GenericProcessor* parentNode, bool useDefaultParameterEditors = true)
     : GenericEditor (parentNode, useDefaultParameterEditors)
-
+    , selectedSource(0)
 {
-    desiredWidth = 180;
+    desiredWidth = 220;
 
     TrackingNode* processor = (TrackingNode*)getProcessor();
+
+    sourceSelector = new ComboBox();
+    sourceSelector->setBounds(45,30,130,20);
+    sourceSelector->addListener(this);
+    addAndMakeVisible(sourceSelector);
+
+    plusButton = new UtilityButton("+", titleFont);
+    plusButton->addListener(this);
+    plusButton->setRadius(3.0f);
+    plusButton->setBounds(10,30,20,20);
+    addAndMakeVisible(plusButton);
+
+    minusButton = new UtilityButton("-", titleFont);
+    minusButton->addListener(this);
+    minusButton->setRadius(3.0f);
+    minusButton->setBounds(190,30,20,20);
+    addAndMakeVisible(minusButton);
+
+    portLabel = new Label ("Port", "Port:");
+    portLabel->setBounds (10, 55, 140, 25);
+    addAndMakeVisible (portLabel);
+    int defaultPort = 27020;
+    labelPort = new Label ("Port", String (defaultPort));
+    labelPort->setBounds (80, 60, 80, 18);
+    labelPort->setFont (Font ("Default", 15, Font::plain));
+    labelPort->setColour (Label::textColourId, Colours::white);
+    labelPort->setColour (Label::backgroundColourId, Colours::grey);
+    labelPort->setEditable (true);
+    labelPort->addListener (this);
+    addAndMakeVisible (labelPort);
 
     adrLabel = new Label ("Address", "Address:");
     adrLabel->setBounds (10, 80, 140, 25);
@@ -47,70 +85,106 @@ TrackingNodeEditor::TrackingNodeEditor (GenericProcessor* parentNode, bool useDe
     labelAdr->setEditable (true);
     labelAdr->addListener (this);
     addAndMakeVisible (labelAdr);
-    processor->setAddress (defaultAddress);
 
-    urlLabel = new Label ("Port", "Port:");
-    urlLabel->setBounds (10, 40, 140, 25);
-    addAndMakeVisible (urlLabel);
-
-    int defaultPort = 27020;
-    labelPort = new Label ("Port", String (defaultPort));
-    labelPort->setBounds (80, 45, 80, 18);
-    labelPort->setFont (Font ("Default", 15, Font::plain));
-    labelPort->setColour (Label::textColourId, Colours::white);
-    labelPort->setColour (Label::backgroundColourId, Colours::grey);
-    labelPort->setEditable (true);
-    labelPort->addListener (this);
-    addAndMakeVisible (labelPort);
-    processor->setPort (defaultPort);
+    colorLabel = new Label ("Color", "Color:");
+    colorLabel->setBounds (10, 105, 140, 25);
+    addAndMakeVisible (colorLabel);
+    String defaultColor = "red";
+    labelColor = new Label ("Color", String (defaultColor));
+    labelColor->setBounds (80, 110, 80, 18);
+    labelColor->setFont (Font ("Default", 15, Font::plain));
+    labelColor->setColour (Label::textColourId, Colours::white);
+    labelColor->setColour (Label::backgroundColourId, Colours::grey);
+    labelColor->setEditable (true);
+    labelColor->addListener (this);
+    addAndMakeVisible (labelColor);
 }
 
 TrackingNodeEditor::~TrackingNodeEditor()
 {
-    // TODO should we delete all children, check JUCE docs
-    // PS: Causes segfault if we do right now
-    //    deleteAllChildren();
 }
 
 void TrackingNodeEditor::labelTextChanged (Label* label)
 {
+    int selectedSource = sourceSelector->getSelectedId() - 1;
+    TrackingNode* p = (TrackingNode*) getProcessor();
+
     if (label == labelAdr)
     {
         Value val = label->getTextValue();
-
-        TrackingNode* p = (TrackingNode*)getProcessor();
-        p->setAddress (val.getValue());
+        p->setAddress (selectedSource, val.getValue());
     }
 
     if (label == labelPort)
     {
         Value val = label->getTextValue();
-
-        TrackingNode* p = (TrackingNode*)getProcessor();
-        p->setPort (val.getValue());
+        p->setPort (selectedSource, val.getValue());
     }
-}
 
-
-
-void TrackingNodeEditor::saveCustomParameters (XmlElement* parentElement)
-{
-    XmlElement* mainNode = parentElement->createNewChildElement ("TrackingNode");
-    mainNode->setAttribute ("port", labelPort->getText());
-    mainNode->setAttribute ("address", labelAdr->getText());
-}
-
-void TrackingNodeEditor::loadCustomParameters (XmlElement* parametersAsXml)
-{
-    if (parametersAsXml != nullptr)
+    if (label == labelColor)
     {
-        forEachXmlChildElement (*parametersAsXml, mainNode)
-        {
-            if (mainNode->hasTagName ("TrackingNode"))
-            {
-                labelPort->setText (mainNode->getStringAttribute ("port"), sendNotification);
-                labelAdr->setText (mainNode->getStringAttribute ("address"), sendNotification);
-            }
-        }
+        Value val = label->getTextValue();
+        p->setColor (selectedSource, val.getValue());
     }
+    updateSettings();
+}
+
+void TrackingNodeEditor::comboBoxChanged(ComboBox* c)
+{
+    selectedSource = c->getSelectedId() - 1;
+    updateLabels();
+}
+
+void TrackingNodeEditor::updateLabels()
+{
+    TrackingNode* p = (TrackingNode*) getProcessor();
+    labelAdr->setText(p->getAddress(selectedSource), dontSendNotification);
+    labelPort->setText(String(p->getPort(selectedSource)), dontSendNotification);
+    labelColor->setText(p->getColor(selectedSource), dontSendNotification);
+}
+
+void TrackingNodeEditor::buttonEvent(Button* button)
+{
+    TrackingNode* p = (TrackingNode*) getProcessor();
+    if (button == plusButton && p->getNSources() < MAX_SOURCES)
+        addTrackingSource();
+    else if (button == minusButton && p->getNSources() > 1)
+        removeTrackingSource();
+    else
+        CoreServices::sendStatusMessage("Number of sources must be between 1 and 10!");
+    CoreServices::updateSignalChain(this);
+}
+
+void TrackingNodeEditor::addTrackingSource()
+{
+    std::cout << "Adding source" << std::endl;
+    TrackingNode* p = (TrackingNode*) getProcessor();
+
+    p->addSource(DEF_PORT, DEF_ADDRESS, DEF_COLOR);
+    updateSettings();
+    sourceSelector->setSelectedId(sourceSelector->getNumItems());
+    selectedSource = sourceSelector->getSelectedId() - 1;
+}
+
+void TrackingNodeEditor::removeTrackingSource()
+{
+    std::cout << "Removing source" << std::endl;
+    TrackingNode* p = (TrackingNode*) getProcessor();
+
+    p->removeSource(selectedSource);
+    if (selectedSource >= p->getNSources())
+        selectedSource = p->getNSources() - 1;
+    updateSettings();
+}
+
+void TrackingNodeEditor::updateSettings()
+{
+    TrackingNode* p = (TrackingNode*) getProcessor();
+    sourceSelector->clear();
+
+    for (int i = 0; i < p->getNSources(); i++)
+        sourceSelector->addItem("Source " + String(i+1), i+1);
+
+    sourceSelector->setSelectedId(selectedSource+1);
+    updateLabels();
 }
