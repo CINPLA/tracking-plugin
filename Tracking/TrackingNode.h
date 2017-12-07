@@ -51,6 +51,8 @@
 #define DEF_ADDRESS "/red"
 #define DEF_COLOR "red"
 
+using namespace std;
+
 /**
     This helper class allows stores input tracking data in a circular queue.
 */
@@ -84,7 +86,6 @@ class TrackingServer: public osc::OscPacketListener,
     public Thread
 {
 public:
-    TrackingServer ();
     TrackingServer (int port, String address);
     ~TrackingServer();
 
@@ -104,7 +105,7 @@ private:
     int m_incomingPort;
     String m_address;
 
-    UdpListeningReceiveSocket m_listeningSocket;
+    UdpListeningReceiveSocket *m_listeningSocket = nullptr;
     std::vector<TrackingNode*> m_processors;
 };
 
@@ -148,13 +149,42 @@ public:
 
 private:
 
-    struct TrackingModule
+    class TrackingModule
     {
-        String address;
-        int port;
-        String color;
-        TrackingQueue* messageQueue;
-        TrackingServer* server;
+    public:
+        TrackingModule(int port, String address, String color, TrackingNode *processor)
+            : m_port(port)
+            , m_address(address)
+            , m_color(color)
+            , m_messageQueue(new TrackingQueue())
+            , m_server(new TrackingServer(port, address))
+        {
+            m_server->addProcessor(processor);
+            m_server->startThread();
+        }
+        ~TrackingModule() {
+            if (m_messageQueue)
+            {
+                cout << "Deleting message queue" << endl;
+                delete m_messageQueue;
+            }
+            if (m_server)
+            {
+                m_server->stop();
+                cout << "Stopping thread" << endl;
+                m_server->stopThread(-1);
+                cout << "Waiting for exit" << endl;
+                m_server->waitForThreadToExit(-1);
+                cout << "Delete server" << endl;
+                delete m_server;
+            }
+        }
+        int m_port = -1;
+        String m_address;
+        String m_color;
+        TrackingQueue *m_messageQueue = nullptr;
+        TrackingServer *m_server = nullptr;
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TrackingModule);
     };
 
     int64 m_startingRecTimeMillis;
@@ -167,7 +197,7 @@ private:
     bool m_isAcquisitionTimeLogged;   
     int m_received_msg;
 
-    Array<TrackingModule> trackingModules;
+    Array<TrackingModule*> trackingModules;
     Array<const EventChannel*> moduleEventChannels;
     int lastNumInputs;
 

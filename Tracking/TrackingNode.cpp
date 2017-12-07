@@ -50,17 +50,10 @@ TrackingNode::TrackingNode()
     setProcessorType (PROCESSOR_TYPE_SOURCE);
     sendSampleCount = false;
 
-    TrackingModule module;
-    module.address = "/red";
-    module.port = 27020;
-    module.color = "red";
-    module.messageQueue = new TrackingQueue();
-    //    module.server = new TrackingServer(module.port, module.address);
-    module.server = new TrackingServer(module.port, module.address);
-    module.server->addProcessor(this);
-    module.server->startThread();
+    cout << "Adding module" << endl;
+//    auto module = new TrackingModule(27020, "/red", "red", this);
 
-    trackingModules.add (module);
+//    trackingModules.add (module);
 
     lastNumInputs = 0;
 
@@ -68,12 +61,12 @@ TrackingNode::TrackingNode()
 
 TrackingNode::~TrackingNode()
 {
-//    for (int i; i< trackingModules.size (); i++)
-//    {
-//        TrackingModule& current  = trackingModules.getReference(i);
-//        std::cout << "Removing source " << i << std::endl;
-//        current.server->stop();
-//    }
+    for (int i; i< trackingModules.size (); i++)
+    {
+        auto *current = trackingModules.getReference(i);
+        std::cout << "Removing source " << i << std::endl;
+        delete current;
+    }
 }
 
 AudioProcessorEditor* TrackingNode::createEditor()
@@ -86,6 +79,7 @@ AudioProcessorEditor* TrackingNode::createEditor()
 //add that info as a metadata field.
 void TrackingNode::updateSettings()
 {
+    cout << "Updating settings!" << endl;
     moduleEventChannels.clear();
     for (int i = 0; i < trackingModules.size(); i++)
     {
@@ -102,39 +96,24 @@ void TrackingNode::updateSettings()
 
 void TrackingNode::addSource (int port, String address, String color)
 {
-    TrackingModule module;
-    module.address = address;
-    module.port = port;
-    module.color = color;
-    module.messageQueue = new TrackingQueue();
-
-    if (!isPortUsed(port))
+    cout << "Adding source" << port << endl;
+    try
     {
-        try
-        {
-            module.server = new TrackingServer(module.port, module.address);
-            module.server->addProcessor(this);
-            module.server->startThread();
-        }
-        catch (const std::runtime_error& e)
-        {
-            std::cout << "Add source: " << e.what() << std::endl;
-        }
+        auto *module = new TrackingModule(port, address, color, this);
+        trackingModules.add (module);
     }
-    else
+    catch (const std::runtime_error& e)
     {
-        module.server = new TrackingServer();
-        module.server->addProcessor(this);
+        std::cout << "Add source: " << e.what() << std::endl;
     }
 
-    trackingModules.add (module);
 }
 
 void TrackingNode::removeSource (int i)
 {
-    TrackingModule& current  = trackingModules.getReference(i);
-    delete current.server;
+    auto *current = trackingModules.getReference(i);
     trackingModules.remove(i);
+    delete current;
 }
 
 bool TrackingNode::isPortUsed(int port)
@@ -142,8 +121,8 @@ bool TrackingNode::isPortUsed(int port)
     bool used = false;
     for (int i = 0; i < trackingModules.size (); i++)
     {
-        TrackingModule& current  = trackingModules.getReference(i);
-        if (current.port == port)
+        auto *current = trackingModules.getReference(i);
+        if (current->m_port == port)
             used = true;
     }
     return used;
@@ -151,23 +130,22 @@ bool TrackingNode::isPortUsed(int port)
 
 void TrackingNode::setPort (int i, int port)
 {
-    if (i < trackingModules.size ())
+    if (i < 0 || i >= trackingModules.size ())
     {
-        TrackingModule& module = trackingModules.getReference (i);
-        module.port = port;
+        return;
+    }
 
-        // reinstantiate server
-        delete module.server;
-        try
-        {
-            module.server = new TrackingServer(module.port, module.address);
-            module.server->addProcessor(this);
-            module.server->startThread();
-        }
-        catch (const std::runtime_error& e)
-        {
-            std::cout << "Set port: " << e.what() << std::endl;
-        }
+    auto *module = trackingModules.getReference (i);
+    String address = module->m_address;
+    String color = module->m_color;
+    delete module;
+    try
+    {
+        module = new TrackingModule(port, address, color, this);
+    }
+    catch (const std::runtime_error& e)
+    {
+        std::cout << "Set port: " << e.what() << std::endl;
     }
 }
 
@@ -175,8 +153,8 @@ int TrackingNode::getPort(int i)
 {
     if (i < trackingModules.size ())
     {
-        TrackingModule& module = trackingModules.getReference (i);
-        return module.port;
+        auto *module = trackingModules.getReference (i);
+        return module->m_port;
     }
     else
         return -1;
@@ -184,44 +162,41 @@ int TrackingNode::getPort(int i)
 
 void TrackingNode::setAddress (int i, String address)
 {
-    if (i < trackingModules.size ())
+    if (i < 0 || i >= trackingModules.size ())
     {
-        TrackingModule& module = trackingModules.getReference (i);
-        module.address = address;
+        return;
+    }
 
-        // reinstantiate server
-        delete module.server;
-        try
-        {
-            module.server = new TrackingServer(module.port, module.address);
-            module.server->addProcessor(this);
-            module.server->startThread();
-        }
-        catch (const std::runtime_error& e)
-        {
-            std::cout << "Set address: " <<e.what() << std::endl;
-        }
-
+    auto *module = trackingModules.getReference (i);
+    int port = module->m_port;
+    String color = module->m_color;
+    delete module;
+    try
+    {
+        module = new TrackingModule(port, address, color, this);
+    }
+    catch (const std::runtime_error& e)
+    {
+        std::cout << "Set address: " << e.what() << std::endl;
     }
 }
 
 String TrackingNode::getAddress(int i)
 {
-    if (i < trackingModules.size ())
-    {
-        TrackingModule& module = trackingModules.getReference (i);
-        return module.address;
-    }
-    else
+    if (i < 0 || i >= trackingModules.size ()) {
         return "";
+    }
+
+    auto *module = trackingModules.getReference (i);
+    return module->m_address;
 }
 
 void TrackingNode::setColor (int i, String color)
 {
     if (i < trackingModules.size ())
     {
-        TrackingModule& module = trackingModules.getReference (i);
-        module.color = color;
+        auto *module = trackingModules.getReference (i);
+        module->m_color = color;
     }
 }
 
@@ -229,8 +204,8 @@ String TrackingNode::getColor(int i)
 {
     if (i < trackingModules.size ())
     {
-        TrackingModule& module = trackingModules.getReference (i);
-        return module.color;
+        auto *module = trackingModules.getReference (i);
+        return module->m_color;
     }
     else
         return "";
@@ -247,9 +222,9 @@ void TrackingNode::process (AudioSampleBuffer&)
 
     for (int i = 0; i < trackingModules.size (); i++)
     {
-        TrackingModule& module = trackingModules.getReference (i);
+        auto *module = trackingModules.getReference (i);
         while (true) {
-            auto *message = module.messageQueue->pop ();
+            auto *message = module->m_messageQueue->pop ();
             if (!message) {
                 break;
             }
@@ -257,7 +232,7 @@ void TrackingNode::process (AudioSampleBuffer&)
             setTimestampAndSamples (uint64(message->timestamp), 0);
             MetaDataValueArray metadata;
             MetaDataValuePtr color = new MetaDataValue(MetaDataDescriptor::CHAR, 15);
-            color->setValue(module.color.toLowerCase());
+            color->setValue(module->m_color.toLowerCase());
             metadata.add(color);
             const EventChannel* chan = getEventChannel (getEventChannelIndex (i, getNodeId()));
             BinaryEventPtr event = BinaryEvent::createBinaryEvent (chan,
@@ -279,8 +254,8 @@ int TrackingNode::getTrackingModuleIndex(int port, String address)
     int index = -1;
     for (int i = 0; i < trackingModules.size (); i++)
     {
-        TrackingModule& current  = trackingModules.getReference(i);
-        if (current.port == port && current.address.compare(address) == 0)
+        auto *current  = trackingModules.getReference(i);
+        if (current->m_port == port && current->m_address.compare(address) == 0)
             index = i;
     }
     return index;
@@ -296,7 +271,7 @@ void TrackingNode::receiveMessage (int port, String address, const TrackingData 
     int index = getTrackingModuleIndex(port, address);
     if (index != -1)
     {
-        TrackingModule& selectedModule = trackingModules.getReference (index);
+        auto *selectedModule = trackingModules.getReference (index);
 
         lock.enter();
 
@@ -308,7 +283,7 @@ void TrackingNode::receiveMessage (int port, String address, const TrackingData 
                 m_startingRecTimeMillis =  Time::currentTimeMillis();
                 m_isRecordingTimeLogged = true;
                 std::cout << "Starting Recording Ts: " << m_startingRecTimeMillis << std::endl;
-                selectedModule.messageQueue->clear();
+                selectedModule->m_messageQueue->clear();
                 CoreServices::sendStatusMessage ("Clearing queue before start recording");
             }
         }
@@ -325,7 +300,7 @@ void TrackingNode::receiveMessage (int port, String address, const TrackingData 
                 m_startingAcqTimeMillis = Time::currentTimeMillis();
                 m_isAcquisitionTimeLogged = true;
                 std::cout << "Starting Acquisition at Ts: " << m_startingAcqTimeMillis << std::endl;
-                selectedModule.messageQueue->clear();
+                selectedModule->m_messageQueue->clear();
                 CoreServices::sendStatusMessage ("Clearing queue before start acquisition");
             }
 
@@ -335,7 +310,7 @@ void TrackingNode::receiveMessage (int port, String address, const TrackingData 
 
             TrackingData outputMessage = message;
             outputMessage.timestamp = ts;
-            selectedModule.messageQueue->push (outputMessage);
+            selectedModule->m_messageQueue->push (outputMessage);
             m_received_msg++;
         }
         else
@@ -356,11 +331,11 @@ void TrackingNode::saveCustomParametersToXml (XmlElement* parentElement)
     XmlElement* mainNode = parentElement->createNewChildElement ("TrackingNode");
     for (int i = 0; i < trackingModules.size(); i++)
     {
-        TrackingModule& module = trackingModules.getReference (i);
+        auto *module = trackingModules.getReference (i);
         XmlElement* source = new XmlElement("Source_"+String(i+1));
-        source->setAttribute ("port", module.port);
-        source->setAttribute ("address", module.address);
-        source->setAttribute ("color", module.color);
+        source->setAttribute ("port", module->m_port);
+        source->setAttribute ("address", module->m_address);
+        source->setAttribute ("color", module->m_color);
         mainNode->addChildElement(source);
     }
 }
@@ -368,20 +343,22 @@ void TrackingNode::saveCustomParametersToXml (XmlElement* parentElement)
 void TrackingNode::loadCustomParametersFromXml ()
 {
     trackingModules.clear();
-    if (parametersAsXml != nullptr)
+    if (parametersAsXml == nullptr)
     {
-        forEachXmlChildElement (*parametersAsXml, mainNode)
-        {
-            if (mainNode->hasTagName ("TrackingNode"))
-            {
-                forEachXmlChildElement(*mainNode, source)
-                {
-                    int port = source->getIntAttribute("port");
-                    String address = source->getStringAttribute("address");
-                    String color = source->getStringAttribute("color");
+        return;
+    }
 
-                    addSource (port, address, color);
-                }
+    forEachXmlChildElement (*parametersAsXml, mainNode)
+    {
+        if (mainNode->hasTagName ("TrackingNode"))
+        {
+            forEachXmlChildElement(*mainNode, source)
+            {
+                int port = source->getIntAttribute("port");
+                String address = source->getStringAttribute("address");
+                String color = source->getStringAttribute("color");
+
+                addSource (port, address, color);
             }
         }
     }
@@ -426,26 +403,21 @@ void TrackingQueue::clear()
 
 
 // Class TrackingServer methods
-TrackingServer::TrackingServer ()
-    : Thread ("OscListener Thread")
-    , m_listeningSocket (IpEndpointName (), this)
-{
-}
-
 TrackingServer::TrackingServer (int port, String address)
     : Thread ("OscListener Thread")
     , m_incomingPort (port)
     , m_address (address)
-    , m_listeningSocket (IpEndpointName ("localhost", m_incomingPort), this)
 {
 }
 
 TrackingServer::~TrackingServer()
 {
+    cout << "Destructing tracking server" << endl;
     // stop the OSC Listener thread running
-    m_listeningSocket.AsynchronousBreak();
+//    m_listeningSocket->Break();
     // allow the thread 2 seconds to stop cleanly - should be plenty of time.
-    stopThread (2000);
+    cout << "Destructed tracking server" << endl;
+    delete m_listeningSocket;
 }
 
 void TrackingServer::ProcessMessage (const osc::ReceivedMessage& receivedMessage,
@@ -514,15 +486,28 @@ void TrackingServer::removeProcessor (TrackingNode* processor)
 
 void TrackingServer::run()
 {
+    cout << "SLeeping!" << endl;
+    sleep(1000);
+    cout << "Running!" << endl;
     // Start the oscpack OSC Listener Thread
-    m_listeningSocket.Run();
+    try {
+        m_listeningSocket = new UdpListeningReceiveSocket(IpEndpointName("localhost", m_incomingPort), this);
+        sleep(1000);
+        m_listeningSocket->Run();
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << "Exception in TrackingServer::run(): " << e.what() << std::endl;
+    }
 }
 
 void TrackingServer::stop()
 {
     // Stop the oscpack OSC Listener Thread
-    if (isThreadRunning())
+    if (!isThreadRunning())
     {
-        m_listeningSocket.AsynchronousBreak();
+        return;
     }
+
+    m_listeningSocket->AsynchronousBreak();
 }

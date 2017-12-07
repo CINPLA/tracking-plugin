@@ -137,6 +137,9 @@ void TrackingNodeEditor::comboBoxChanged(ComboBox* c)
 
 void TrackingNodeEditor::updateLabels()
 {
+    if (selectedSource < 0) {
+        return;
+    }
     TrackingNode* p = (TrackingNode*) getProcessor();
     labelAdr->setText(p->getAddress(selectedSource), dontSendNotification);
     labelPort->setText(String(p->getPort(selectedSource)), dontSendNotification);
