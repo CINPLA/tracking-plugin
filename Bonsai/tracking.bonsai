@@ -177,17 +177,9 @@
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="q3:FlyCapture">
           <q3:Index>0</q3:Index>
+          <q3:ColorFormat>Bgr</q3:ColorFormat>
           <q3:ColorProcessing>Default</q3:ColorProcessing>
         </Combinator>
-      </Expression>
-      <Expression xsi:type="Combinator">
-        <Combinator xsi:type="Zip" />
-      </Expression>
-      <Expression xsi:type="MemberSelector">
-        <Selector>Source.Metadata.embeddedTimeStamp</Selector>
-      </Expression>
-      <Expression xsi:type="MemberSelector">
-        <Selector>Source.Metadata.embeddedFrameCounter</Selector>
       </Expression>
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="Zip" />
@@ -272,12 +264,12 @@
       </Edge>
       <Edge>
         <From>9</From>
-        <To>18</To>
+        <To>15</To>
         <Label>Source1</Label>
       </Edge>
       <Edge>
         <From>10</From>
-        <To>19</To>
+        <To>16</To>
         <Label>Source1</Label>
       </Edge>
       <Edge>
@@ -287,7 +279,7 @@
       </Edge>
       <Edge>
         <From>11</From>
-        <To>20</To>
+        <To>17</To>
         <Label>Source1</Label>
       </Edge>
       <Edge>
@@ -301,63 +293,43 @@
         <Label>Source1</Label>
       </Edge>
       <Edge>
-        <From>13</From>
-        <To>16</To>
-        <Label>Source1</Label>
-      </Edge>
-      <Edge>
-        <From>13</From>
-        <To>15</To>
+        <From>14</From>
+        <To>22</To>
         <Label>Source1</Label>
       </Edge>
       <Edge>
         <From>15</From>
         <To>14</To>
-        <Label>Source2</Label>
+        <Label>Source1</Label>
       </Edge>
       <Edge>
         <From>16</From>
         <To>14</To>
-        <Label>Source1</Label>
-      </Edge>
-      <Edge>
-        <From>17</From>
-        <To>25</To>
-        <Label>Source1</Label>
-      </Edge>
-      <Edge>
-        <From>18</From>
-        <To>17</To>
-        <Label>Source1</Label>
-      </Edge>
-      <Edge>
-        <From>19</From>
-        <To>17</To>
         <Label>Source2</Label>
       </Edge>
       <Edge>
-        <From>20</From>
-        <To>17</To>
+        <From>17</From>
+        <To>14</To>
         <Label>Source3</Label>
       </Edge>
       <Edge>
-        <From>23</From>
+        <From>20</From>
+        <To>18</To>
+        <Label>Source1</Label>
+      </Edge>
+      <Edge>
+        <From>21</From>
+        <To>19</To>
+        <Label>Source1</Label>
+      </Edge>
+      <Edge>
+        <From>22</From>
+        <To>20</To>
+        <Label>Source1</Label>
+      </Edge>
+      <Edge>
+        <From>22</From>
         <To>21</To>
-        <Label>Source1</Label>
-      </Edge>
-      <Edge>
-        <From>24</From>
-        <To>22</To>
-        <Label>Source1</Label>
-      </Edge>
-      <Edge>
-        <From>25</From>
-        <To>23</To>
-        <Label>Source1</Label>
-      </Edge>
-      <Edge>
-        <From>25</From>
-        <To>24</To>
         <Label>Source1</Label>
       </Edge>
     </Edges>
@@ -371,7 +343,7 @@
     <Type>Bonsai.Vision.BinaryRegionAnalysis, Bonsai.Vision, Version=2.3.0.0, Culture=neutral, PublicKeyToken=null</Type>
     <Type>Bonsai.Vision.LargestBinaryRegion, Bonsai.Vision, Version=2.3.0.0, Culture=neutral, PublicKeyToken=null</Type>
     <Type>Bonsai.Vision.Crop, Bonsai.Vision, Version=2.3.0.0, Culture=neutral, PublicKeyToken=null</Type>
-    <Type>Bonsai.PointGrey.FlyCapture, Bonsai.PointGrey, Version=2.2.0.0, Culture=neutral, PublicKeyToken=null</Type>
+    <Type>Bonsai.PointGrey.FlyCapture, Bonsai.PointGrey, Version=2.3.0.0, Culture=neutral, PublicKeyToken=null</Type>
     <Type>Bonsai.Osc.SendMessage, Bonsai.Osc, Version=2.3.0.0, Culture=neutral, PublicKeyToken=null</Type>
     <Type>Bonsai.Scripting.ExpressionTransform, Bonsai.Scripting, Version=2.3.0.0, Culture=neutral, PublicKeyToken=null</Type>
   </ExtensionTypes>
