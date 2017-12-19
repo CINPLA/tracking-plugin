@@ -1,0 +1,3 @@
+[submodule "py-open-ephys"]
+	path = py-open-ephys
+	url = https://github.com/CINPLA/py-open-ephys.git
