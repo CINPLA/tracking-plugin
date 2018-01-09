@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<SETTINGS>
+  <INFO>
+    <VERSION>0.4.2.1</VERSION>
+    <PLUGIN_API_VERSION>5</PLUGIN_API_VERSION>
+    <DATE>15 Dec 2017 15:04:54</DATE>
+    <OS>Linux</OS>
+    <MACHINE>home</MACHINE>
+  </INFO>
+  <SIGNALCHAIN>
+    <PROCESSOR name="Sources/Tracking Port" insertionPoint="1" pluginName="Tracking Port"
+               pluginType="1" pluginIndex="5" libraryName="Tracking" libraryVersion="1"
+               isSource="1" isSink="0" NodeId="100">
+      <TrackingNode>
+        <Source_1 port="27020" address="/red" color="red"/>
+        <Source_2 port="27021" address="/green" color="green"/>
+        <Source_3 port="27022" address="/blue" color="blue"/>
+        <Source_4 port="27023" address="/magenta" color="magenta"/>
+        <Source_5 port="27024" address="/cyan" color="cyan"/>
+        <Source_6 port="27025" address="/orange" color="orange"/>
+        <Source_7 port="27026" address="/pink" color="pink"/>
+        <Source_8 port="27027" address="/grey" color="grey"/>
+        <Source_9 port="27028" address="/violet" color="violet"/>
+        <Source_10 port="27029" address="/yellow" color="yellow"/>
+      </TrackingNode>
+      <EVENTCHANNEL name="0" number="0"/>
+      <EVENTCHANNEL name="1" number="1"/>
+      <EVENTCHANNEL name="2" number="2"/>
+      <EVENTCHANNEL name="3" number="3"/>
+      <EVENTCHANNEL name="4" number="4"/>
+      <EVENTCHANNEL name="5" number="5"/>
+      <EVENTCHANNEL name="6" number="6"/>
+      <EVENTCHANNEL name="7" number="7"/>
+      <EVENTCHANNEL name="8" number="8"/>
+      <EVENTCHANNEL name="9" number="9"/>
+      <EDITOR isCollapsed="0" displayName="Tracking Port"/>
+    </PROCESSOR>
+    <PROCESSOR name="Sinks/Tracking Visual" insertionPoint="1" pluginName="Tracking Visual"
+               pluginType="1" pluginIndex="7" libraryName="Tracking" libraryVersion="1"
+               isSource="0" isSink="1" NodeId="101">
+      <EVENTCHANNEL name="0" number="0"/>
+      <EVENTCHANNEL name="1" number="1"/>
+      <EVENTCHANNEL name="2" number="2"/>
+      <EVENTCHANNEL name="3" number="3"/>
+      <EVENTCHANNEL name="4" number="4"/>
+      <EVENTCHANNEL name="5" number="5"/>
+      <EVENTCHANNEL name="6" number="6"/>
+      <EVENTCHANNEL name="7" number="7"/>
+      <EVENTCHANNEL name="8" number="8"/>
+      <EVENTCHANNEL name="9" number="9"/>
+      <EDITOR isCollapsed="0" displayName="Tracking Visual" Type="Visualizer">
+        <TAB Active="1"/>
+        <WINDOW Active="0"/>
+      </EDITOR>
+    </PROCESSOR>
+  </SIGNALCHAIN>
+  <AUDIO bufferSize="1024"/>
+  <GLOBAL_TIMESTAMP selected_index="-1" selected_sub_index="0"/>
+  <CONTROLPANEL isOpen="1" recordPath="/home/alessiob/Documents/Codes/C++/open-ephys-plugin-GUI/Tests"
+                prependText="test_sources_multi" appendText="" recordEngine="RAWBINARY"/>
+  <AUDIOEDITOR isMuted="0" volume="0" noiseGate="0"/>
+  <RECORDENGINES>
+    <ENGINE id="OPENEPHYS" name="Open Ephys">
+      <PARAMETER id="0" type="bool" value="0"/>
+      <PARAMETER id="1" type="bool" value="0"/>
+      <PARAMETER id="2" type="string" value="CH"/>
+    </ENGINE>
+    <ENGINE id="RAWBINARY" name="Binary">
+      <PARAMETER id="0" type="bool" value="1"/>
+    </ENGINE>
+    <ENGINE id="KWIK" name="Kwik"/>
+    <ENGINE id="NWB" name="NWB">
+      <PARAMETER id="0" type="string" value=""/>
+    </ENGINE>
+  </RECORDENGINES>
+  <PROCESSORLIST>
+    <COLOR ID="801" R="59" G="59" B="59"/>
+    <COLOR ID="804" R="241" G="90" B="41"/>
+    <COLOR ID="802" R="0" G="174" B="239"/>
+    <COLOR ID="803" R="0" G="166" B="81"/>
+    <COLOR ID="805" R="147" G="149" B="152"/>
+  </PROCESSORLIST>
+  <UICOMPONENT isProcessorListOpen="1" isEditorViewportOpen="1"/>
+</SETTINGS>

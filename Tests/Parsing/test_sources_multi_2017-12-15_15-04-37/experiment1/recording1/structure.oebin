@@ -1,0 +1,347 @@
+{
+    "GUI version": "0.4.2.1",
+    "continuous": [],
+    "events": [
+      {
+        "folder_name": "Tracking_Port-100.0/BINARY_group_1/",
+        "channel_name": "Tracking data",
+        "description": "Tracking data received from Bonsai. x, y, width, height",
+        "identifier": "external.tracking.rawData",
+        "sample_rate": 1000000,
+        "type": "uint8",
+        "num_channels": 1,
+        "source_processor": "Tracking Port",
+        "event_metadata": [
+          {
+            "name": "Color",
+            "description": "Tracking source color to be displayed",
+            "identifier": "channelInfo.extra",
+            "type": "string",
+            "length": 15
+          },
+          {
+            "name": "Port",
+            "description": "Tracking source OSC port",
+            "identifier": "channelInfo.extra",
+            "type": "int32",
+            "length": 1
+          },
+          {
+            "name": "Address",
+            "description": "Tracking source OSC address",
+            "identifier": "channelInfo.extra",
+            "type": "string",
+            "length": 15
+          }
+        ]
+      },
+      {
+        "folder_name": "Tracking_Port-100.0/BINARY_group_2/",
+        "channel_name": "Tracking data",
+        "description": "Tracking data received from Bonsai. x, y, width, height",
+        "identifier": "external.tracking.rawData",
+        "sample_rate": 1000000,
+        "type": "uint8",
+        "num_channels": 1,
+        "source_processor": "Tracking Port",
+        "event_metadata": [
+          {
+            "name": "Color",
+            "description": "Tracking source color to be displayed",
+            "identifier": "channelInfo.extra",
+            "type": "string",
+            "length": 15
+          },
+          {
+            "name": "Port",
+            "description": "Tracking source OSC port",
+            "identifier": "channelInfo.extra",
+            "type": "int32",
+            "length": 1
+          },
+          {
+            "name": "Address",
+            "description": "Tracking source OSC address",
+            "identifier": "channelInfo.extra",
+            "type": "string",
+            "length": 15
+          }
+        ]
+      },
+      {
+        "folder_name": "Tracking_Port-100.0/BINARY_group_3/",
+        "channel_name": "Tracking data",
+        "description": "Tracking data received from Bonsai. x, y, width, height",
+        "identifier": "external.tracking.rawData",
+        "sample_rate": 1000000,
+        "type": "uint8",
+        "num_channels": 1,
+        "source_processor": "Tracking Port",
+        "event_metadata": [
+          {
+            "name": "Color",
+            "description": "Tracking source color to be displayed",
+            "identifier": "channelInfo.extra",
+            "type": "string",
+            "length": 15
+          },
+          {
+            "name": "Port",
+            "description": "Tracking source OSC port",
+            "identifier": "channelInfo.extra",
+            "type": "int32",
+            "length": 1
+          },
+          {
+            "name": "Address",
+            "description": "Tracking source OSC address",
+            "identifier": "channelInfo.extra",
+            "type": "string",
+            "length": 15
+          }
+        ]
+      },
+      {
+        "folder_name": "Tracking_Port-100.0/BINARY_group_4/",
+        "channel_name": "Tracking data",
+        "description": "Tracking data received from Bonsai. x, y, width, height",
+        "identifier": "external.tracking.rawData",
+        "sample_rate": 1000000,
+        "type": "uint8",
+        "num_channels": 1,
+        "source_processor": "Tracking Port",
+        "event_metadata": [
+          {
+            "name": "Color",
+            "description": "Tracking source color to be displayed",
+            "identifier": "channelInfo.extra",
+            "type": "string",
+            "length": 15
+          },
+          {
+            "name": "Port",
+            "description": "Tracking source OSC port",
+            "identifier": "channelInfo.extra",
+            "type": "int32",
+            "length": 1
+          },
+          {
+            "name": "Address",
+            "description": "Tracking source OSC address",
+            "identifier": "channelInfo.extra",
+            "type": "string",
+            "length": 15
+          }
+        ]
+      },
+      {
+        "folder_name": "Tracking_Port-100.0/BINARY_group_5/",
+        "channel_name": "Tracking data",
+        "description": "Tracking data received from Bonsai. x, y, width, height",
+        "identifier": "external.tracking.rawData",
+        "sample_rate": 1000000,
+        "type": "uint8",
+        "num_channels": 1,
+        "source_processor": "Tracking Port",
+        "event_metadata": [
+          {
+            "name": "Color",
+            "description": "Tracking source color to be displayed",
+            "identifier": "channelInfo.extra",
+            "type": "string",
+            "length": 15
+          },
+          {
+            "name": "Port",
+            "description": "Tracking source OSC port",
+            "identifier": "channelInfo.extra",
+            "type": "int32",
+            "length": 1
+          },
+          {
+            "name": "Address",
+            "description": "Tracking source OSC address",
+            "identifier": "channelInfo.extra",
+            "type": "string",
+            "length": 15
+          }
+        ]
+      },
+      {
+        "folder_name": "Tracking_Port-100.0/BINARY_group_6/",
+        "channel_name": "Tracking data",
+        "description": "Tracking data received from Bonsai. x, y, width, height",
+        "identifier": "external.tracking.rawData",
+        "sample_rate": 1000000,
+        "type": "uint8",
+        "num_channels": 1,
+        "source_processor": "Tracking Port",
+        "event_metadata": [
+          {
+            "name": "Color",
+            "description": "Tracking source color to be displayed",
+            "identifier": "channelInfo.extra",
+            "type": "string",
+            "length": 15
+          },
+          {
+            "name": "Port",
+            "description": "Tracking source OSC port",
+            "identifier": "channelInfo.extra",
+            "type": "int32",
+            "length": 1
+          },
+          {
+            "name": "Address",
+            "description": "Tracking source OSC address",
+            "identifier": "channelInfo.extra",
+            "type": "string",
+            "length": 15
+          }
+        ]
+      },
+      {
+        "folder_name": "Tracking_Port-100.0/BINARY_group_7/",
+        "channel_name": "Tracking data",
+        "description": "Tracking data received from Bonsai. x, y, width, height",
+        "identifier": "external.tracking.rawData",
+        "sample_rate": 1000000,
+        "type": "uint8",
+        "num_channels": 1,
+        "source_processor": "Tracking Port",
+        "event_metadata": [
+          {
+            "name": "Color",
+            "description": "Tracking source color to be displayed",
+            "identifier": "channelInfo.extra",
+            "type": "string",
+            "length": 15
+          },
+          {
+            "name": "Port",
+            "description": "Tracking source OSC port",
+            "identifier": "channelInfo.extra",
+            "type": "int32",
+            "length": 1
+          },
+          {
+            "name": "Address",
+            "description": "Tracking source OSC address",
+            "identifier": "channelInfo.extra",
+            "type": "string",
+            "length": 15
+          }
+        ]
+      },
+      {
+        "folder_name": "Tracking_Port-100.0/BINARY_group_8/",
+        "channel_name": "Tracking data",
+        "description": "Tracking data received from Bonsai. x, y, width, height",
+        "identifier": "external.tracking.rawData",
+        "sample_rate": 1000000,
+        "type": "uint8",
+        "num_channels": 1,
+        "source_processor": "Tracking Port",
+        "event_metadata": [
+          {
+            "name": "Color",
+            "description": "Tracking source color to be displayed",
+            "identifier": "channelInfo.extra",
+            "type": "string",
+            "length": 15
+          },
+          {
+            "name": "Port",
+            "description": "Tracking source OSC port",
+            "identifier": "channelInfo.extra",
+            "type": "int32",
+            "length": 1
+          },
+          {
+            "name": "Address",
+            "description": "Tracking source OSC address",
+            "identifier": "channelInfo.extra",
+            "type": "string",
+            "length": 15
+          }
+        ]
+      },
+      {
+        "folder_name": "Tracking_Port-100.0/BINARY_group_9/",
+        "channel_name": "Tracking data",
+        "description": "Tracking data received from Bonsai. x, y, width, height",
+        "identifier": "external.tracking.rawData",
+        "sample_rate": 1000000,
+        "type": "uint8",
+        "num_channels": 1,
+        "source_processor": "Tracking Port",
+        "event_metadata": [
+          {
+            "name": "Color",
+            "description": "Tracking source color to be displayed",
+            "identifier": "channelInfo.extra",
+            "type": "string",
+            "length": 15
+          },
+          {
+            "name": "Port",
+            "description": "Tracking source OSC port",
+            "identifier": "channelInfo.extra",
+            "type": "int32",
+            "length": 1
+          },
+          {
+            "name": "Address",
+            "description": "Tracking source OSC address",
+            "identifier": "channelInfo.extra",
+            "type": "string",
+            "length": 15
+          }
+        ]
+      },
+      {
+        "folder_name": "Tracking_Port-100.0/BINARY_group_10/",
+        "channel_name": "Tracking data",
+        "description": "Tracking data received from Bonsai. x, y, width, height",
+        "identifier": "external.tracking.rawData",
+        "sample_rate": 1000000,
+        "type": "uint8",
+        "num_channels": 1,
+        "source_processor": "Tracking Port",
+        "event_metadata": [
+          {
+            "name": "Color",
+            "description": "Tracking source color to be displayed",
+            "identifier": "channelInfo.extra",
+            "type": "string",
+            "length": 15
+          },
+          {
+            "name": "Port",
+            "description": "Tracking source OSC port",
+            "identifier": "channelInfo.extra",
+            "type": "int32",
+            "length": 1
+          },
+          {
+            "name": "Address",
+            "description": "Tracking source OSC address",
+            "identifier": "channelInfo.extra",
+            "type": "string",
+            "length": 15
+          }
+        ]
+      },
+      {
+        "folder_name": "Message_Center-904.0/TEXT_group_1/",
+        "channel_name": "GUI Messages",
+        "description": "Messages from the GUI Message Center",
+        "identifier": "genericevent",
+        "sample_rate": 1000000,
+        "type": "string",
+        "num_channels": 1,
+        "source_processor": "Message Center"
+      }
+    ],
+    "spikes": []
+  }
