@@ -1,5 +1,5 @@
 '''
-Simulate and send spiral 2D trajectory via OSC message
+Simulate and send 1 random walk via OSC message
 Input to OpenEphys GUI
 '''
 

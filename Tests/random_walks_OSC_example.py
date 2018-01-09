@@ -1,5 +1,5 @@
 '''
-Simulate and send spiral 2D trajectory via OSC message
+Simulate and send 10 random walks wit different frequency via OSC message
 Input to OpenEphys GUI
 '''
 
@@ -16,7 +16,7 @@ n_sources = 10
 ports = range(27020, 27020 + n_sources)
 addresses = ['/red', '/green', '/blue',  '/magenta', '/cyan', '/orange', '/pink', '/grey', '/violet', '/yellow']
 frequencies = np.linspace(30, 300, n_sources)  # Hz
-duration = 30  # sec
+duration = 60  # sec
 nsamples = []
 osc_ports = []
 periods = []
@@ -47,7 +47,7 @@ for o in osc:
     data.append(np.array(o.sent_trajectory))
 
 print 'Saving'
-if not os.path.exists("data"):
-    os.makedirs("data")
-np.save('data/data_array', data)
-np.save('data/timestamps', ts)
+if not os.path.exists("Python_Data"):
+    os.makedirs("Python_Data")
+np.save('Python_Data/multiple_sources_data_array', data)
+np.save('Python_Data/multiple_sources_timestamps', ts)
