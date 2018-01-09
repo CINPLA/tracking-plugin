@@ -12,19 +12,7 @@ import threading
 
 from random_walks import *
 
-duration = 600  # sec
-nsamples = []
-osc_ports = []
-periods = []
-counts = []
-x_vec = []
-y_vec = []
-width = 1.
-height = 1.
-
-osc = []
-
-thread = OSCthread(name = 'Tread', port=27021, addr='/red', freq=30, duration=300)
-thread.setup(width, height)
+thread = OSCthread(name = 'Tread', port=27020, addr='/red', freq=30, duration=600)
+thread.setup(1., 1.)
 
 thread.run()

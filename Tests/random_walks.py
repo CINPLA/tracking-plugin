@@ -30,7 +30,7 @@ class OSCthread(threading.Thread):
         pos = np.zeros((self.nsamples, 2))
         vel = np.zeros((self.nsamples, 2))
 
-        pos[0] = np.random.uniform(2)
+        pos[0] = np.random.uniform(0, 1, 2)
 
         #while len(x) < self.nsamples:
         dt = 0.01
@@ -81,8 +81,8 @@ class OSCthread(threading.Thread):
                 count += 1
                 oscmsg = OSC.OSCMessage()
                 oscmsg.setAddress(self.addr)
-                oscmsg.append([m_x, m_y, width, height])
-                self.sent_trajectory.append([m_x, m_y, width, height])
+                oscmsg.append([m_x, m_y, self.width, self.height])
+                self.sent_trajectory.append([m_x, m_y, self.width, self.height])
                 self.timestamps.append(curr_t - t0)
                 self.osc.send(oscmsg)
 
