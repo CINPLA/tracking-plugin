@@ -1,5 +1,5 @@
 import threading
-import OSC
+from pythonosc import udp_client
 import time
 import numpy as np
 
