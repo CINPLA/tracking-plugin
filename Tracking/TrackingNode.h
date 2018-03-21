@@ -86,6 +86,7 @@ class TrackingServer: public osc::OscPacketListener,
     public Thread
 {
 public:
+    TrackingServer ();
     TrackingServer (int port, String address);
     ~TrackingServer();
 
@@ -133,12 +134,10 @@ public:
     void receiveMessage (int port, String address, const TrackingData &message);
     int getTrackingModuleIndex(int port, String address);
     void addSource (int port, String address, String color);
+    void addSource ();
     void removeSource (int i);
     int getNSources();
     bool isPortUsed(int port);
-
-
-
 
     void setAddress (int i, String address);
     String getAddress(int i);
@@ -161,6 +160,14 @@ private:
         {
             m_server->addProcessor(processor);
             m_server->startThread();
+        }
+        TrackingModule(TrackingNode *processor)
+            : m_port(0)
+            , m_address("")
+            , m_color("")
+            , m_messageQueue(new TrackingQueue())
+            , m_server(new TrackingServer())
+        {
         }
         ~TrackingModule() {
             if (m_messageQueue)

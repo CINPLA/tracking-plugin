@@ -51,9 +51,9 @@ TrackingNode::TrackingNode()
     sendSampleCount = false;
 
     cout << "Adding module" << endl;
-//    auto module = new TrackingModule(27020, "/red", "red", this);
+    //    auto module = new TrackingModule(27020, "/red", "red", this);
 
-//    trackingModules.add (module);
+    //    trackingModules.add (module);
 
     lastNumInputs = 0;
 
@@ -84,11 +84,13 @@ void TrackingNode::updateSettings()
     for (int i = 0; i < trackingModules.size(); i++)
     {
         //It's going to be raw binary data, so let's make it uint8
-        EventChannel* chan = new EventChannel (EventChannel::UINT8_ARRAY, 1, 24, CoreServices::getGlobalSampleRate(), this);
+        EventChannel* chan = new EventChannel (EventChannel::UINT8_ARRAY, 1, 16, CoreServices::getGlobalSampleRate(), this);
         chan->setName ("Tracking data");
         chan->setDescription ("Tracking data received from Bonsai. x, y, width, height");
         chan->setIdentifier ("external.tracking.rawData");
         chan->addEventMetaData(new MetaDataDescriptor(MetaDataDescriptor::CHAR, 15, "Color", "Tracking source color to be displayed", "channelInfo.extra"));
+        chan->addEventMetaData(new MetaDataDescriptor(MetaDataDescriptor::INT32, 1, "Port", "Tracking source OSC port", "channelInfo.extra"));
+        chan->addEventMetaData(new MetaDataDescriptor(MetaDataDescriptor::CHAR, 15, "Address", "Tracking source OSC address", "channelInfo.extra"));
         eventChannelArray.add (chan);
     }
     lastNumInputs = getNumInputs();
@@ -100,6 +102,21 @@ void TrackingNode::addSource (int port, String address, String color)
     try
     {
         auto *module = new TrackingModule(port, address, color, this);
+        trackingModules.add (module);
+    }
+    catch (const std::runtime_error& e)
+    {
+        std::cout << "Add source: " << e.what() << std::endl;
+    }
+
+}
+
+void TrackingNode::addSource ()
+{
+    cout << "Adding empty source" << endl;
+    try
+    {
+        auto *module = new TrackingModule(this);
         trackingModules.add (module);
     }
     catch (const std::runtime_error& e)
@@ -136,16 +153,20 @@ void TrackingNode::setPort (int i, int port)
     }
 
     auto *module = trackingModules.getReference (i);
+    module->m_port = port;
     String address = module->m_address;
     String color = module->m_color;
-    delete module;
-    try
+    if (address.compare("") != 0)
     {
-        module = new TrackingModule(port, address, color, this);
-    }
-    catch (const std::runtime_error& e)
-    {
-        std::cout << "Set port: " << e.what() << std::endl;
+        delete module;
+        try
+        {
+            module = new TrackingModule(port, address, color, this);
+        }
+        catch (const std::runtime_error& e)
+        {
+            std::cout << "Set port: " << e.what() << std::endl;
+        }
     }
 }
 
@@ -168,16 +189,20 @@ void TrackingNode::setAddress (int i, String address)
     }
 
     auto *module = trackingModules.getReference (i);
+    module->m_address = address;
     int port = module->m_port;
     String color = module->m_color;
-    delete module;
-    try
+    if (port != -1)
     {
-        module = new TrackingModule(port, address, color, this);
-    }
-    catch (const std::runtime_error& e)
-    {
-        std::cout << "Set address: " << e.what() << std::endl;
+        delete module;
+        try
+        {
+            module = new TrackingModule(port, address, color, this);
+        }
+        catch (const std::runtime_error& e)
+        {
+            std::cout << "Set address: " << e.what() << std::endl;
+        }
     }
 }
 
@@ -234,11 +259,17 @@ void TrackingNode::process (AudioSampleBuffer&)
             MetaDataValuePtr color = new MetaDataValue(MetaDataDescriptor::CHAR, 15);
             color->setValue(module->m_color.toLowerCase());
             metadata.add(color);
+            MetaDataValuePtr port = new MetaDataValue(MetaDataDescriptor::INT32, 1);
+            port->setValue(module->m_port);
+            metadata.add(port);
+            MetaDataValuePtr address = new MetaDataValue(MetaDataDescriptor::CHAR, 15);
+            address->setValue(module->m_address.toLowerCase());
+            metadata.add(address);
             const EventChannel* chan = getEventChannel (getEventChannelIndex (i, getNodeId()));
             BinaryEventPtr event = BinaryEvent::createBinaryEvent (chan,
                                                                    message->timestamp,
-                                                                   reinterpret_cast<uint8_t *>(message),
-                                                                   sizeof(TrackingData),
+                                                                   reinterpret_cast<uint8_t *>(&(message->position)),
+                                                                   sizeof(TrackingPosition),
                                                                    metadata);
             addEvent (chan, event, 0);
         }
@@ -306,7 +337,9 @@ void TrackingNode::receiveMessage (int port, String address, const TrackingData 
 
             m_positionIsUpdated = true;
 
-            int64 ts = CoreServices::getGlobalTimestamp();
+            // NOTE: We cannot trust the getGlobalTimestamp function because it can return
+            // negative time deltas. The reason is unknown.
+            int64 ts = CoreServices::getSoftwareTimestamp();
 
             TrackingData outputMessage = message;
             outputMessage.timestamp = ts;
@@ -401,8 +434,14 @@ void TrackingQueue::clear()
     m_head = -1;
 }
 
-
 // Class TrackingServer methods
+TrackingServer::TrackingServer ()
+    : Thread ("OscListener Thread")
+    , m_incomingPort (0)
+    , m_address ("")
+{
+}
+
 TrackingServer::TrackingServer (int port, String address)
     : Thread ("OscListener Thread")
     , m_incomingPort (port)
@@ -414,7 +453,7 @@ TrackingServer::~TrackingServer()
 {
     cout << "Destructing tracking server" << endl;
     // stop the OSC Listener thread running
-//    m_listeningSocket->Break();
+    //    m_listeningSocket->Break();
     // allow the thread 2 seconds to stop cleanly - should be plenty of time.
     cout << "Destructed tracking server" << endl;
     delete m_listeningSocket;
@@ -423,6 +462,7 @@ TrackingServer::~TrackingServer()
 void TrackingServer::ProcessMessage (const osc::ReceivedMessage& receivedMessage,
                                      const IpEndpointName&)
 {
+    int64 ts = CoreServices::getGlobalTimestamp();
     try
     {
         uint32 argumentCount = 4;

@@ -148,9 +148,9 @@ void TrackingVisualizerCanvas::paint (Graphics& g)
 
 void TrackingVisualizerCanvas::resized()
 {
-    clearButton->setBounds(0.01*getWidth(), getHeight()-0.05*getHeight(), 0.1*getWidth(), 0.03*getHeight());
-    sourcesLabel->setBounds(0.01*getWidth(), getHeight()-0.7*getHeight(), 0.1*getWidth(), 0.03*getHeight());
-    listbox->setBounds(0.01*getWidth(), getHeight()-0.65*getHeight(), 0.1*getWidth(), 0.2*getHeight());
+    clearButton->setBounds(0.01*getWidth(), getHeight()-0.05*getHeight(), 0.13*getWidth(), 0.03*getHeight());
+    sourcesLabel->setBounds(0.01*getWidth(), getHeight()-0.7*getHeight(), 0.13*getWidth(), 0.03*getHeight());
+    listbox->setBounds(0.01*getWidth(), getHeight()-0.65*getHeight(), 0.13*getWidth(), 0.4*getHeight());
     refresh();
 }
 

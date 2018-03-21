@@ -178,7 +178,10 @@ private:
     int64 m_previousTime;
     int64 m_currentTime;
 
-    // Tim sim position
+    default_random_engine generator;
+
+
+    // Time sim position
     float m_timePassed_sim;
     int64 m_previousTime_sim;
     int64 m_currentTime_sim;

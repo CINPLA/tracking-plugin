@@ -66,7 +66,7 @@ void TrackingVisualizer::updateSettings()
         {
             s.eventIndex = event->getSourceIndex();
             s.sourceId =  event->getSourceNodeID();
-            s.name = event->getName() + " " + String(event->getSourceIndex()+1);
+            s.name = "Tracking source " + String(event->getSourceIndex()+1);
             s.color = "None";
             s.x_pos = -1;
             s.y_pos = -1;
@@ -102,7 +102,7 @@ void TrackingVisualizer::handleEvent (const EventChannel* eventInfo, const MidiM
 
     int nodeId = evtptr->getSourceID();
     int evtId = evtptr->getSourceIndex();
-    const auto *message = reinterpret_cast<const TrackingData *>(evtptr->getBinaryDataPointer());
+    const auto *position = reinterpret_cast<const TrackingPosition *>(evtptr->getBinaryDataPointer());
 
     int nSources = sources.size ();
 
@@ -111,15 +111,15 @@ void TrackingVisualizer::handleEvent (const EventChannel* eventInfo, const MidiM
         TrackingSources& currentSource = sources.getReference (i);
         if (currentSource.sourceId == nodeId && evtId == currentSource.eventIndex)
         {
-            if(!(message->position.x != message->position.x || message->position.y != message->position.y) && message->position.x != 0 && message->position.y != 0)
+            if(!(position->x != position->x || position->y != position->y) && position->x != 0 && position->y != 0)
             {
-                currentSource.x_pos = message->position.x;
-                currentSource.y_pos = message->position.y;
+                currentSource.x_pos = position->x;
+                currentSource.y_pos = position->y;
             }
-            if(!(message->position.width != message->position.width || message->position.height != message->position.height))
+            if(!(position->width != position->width || position->height != position->height))
             {
-                currentSource.width = message->position.width;
-                currentSource.height = message->position.height;
+                currentSource.width = position->width;
+                currentSource.height = position->height;
             }
 
             String sourceColor;

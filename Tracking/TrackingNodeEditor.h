@@ -32,6 +32,7 @@
 #ifndef TRACKINGNODEEDITOR_H
 #define TRACKINGNODEEDITOR_H
 
+#define MAX_SOURCES 10
 
 #include <EditorHeaders.h>
 
@@ -52,6 +53,9 @@ public:
     void updateLabels();
 
 private:
+    String color_palette[MAX_SOURCES] = {"red", "green", "blue", "magenta", "cyan",
+                                         "orange", "pink", "grey", "violet", "yellow"};
+
     ScopedPointer<ComboBox> sourceSelector;
     ScopedPointer<UtilityButton> plusButton;
     ScopedPointer<UtilityButton> minusButton;
@@ -67,6 +71,7 @@ private:
     ScopedPointer<Label> adrLabel;
     ScopedPointer<Label> labelColor;
     ScopedPointer<Label> colorLabel;
+    ScopedPointer<ComboBox> colorSelector;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TrackingNodeEditor);
 

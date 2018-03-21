@@ -113,7 +113,7 @@ void TrackingStimulatorCanvas::paint (Graphics& g)
         g.setColour(labelColour);
     else
         g.setColour(labelBackgroundColour);
-    g.fillEllipse(getWidth() - 0.065*getWidth(), 0.46*getHeight(), 0.03*getWidth(), 0.03*getHeight());
+    g.fillEllipse(getWidth() - 0.065*getWidth(), 0.41*getHeight(), 0.03*getWidth(), 0.03*getHeight());
 
     if (camWidth > left_limit)
     {

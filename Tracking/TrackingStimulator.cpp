@@ -243,7 +243,7 @@ void TrackingStimulator::updateSettings()
         {
             s.eventIndex = event->getSourceIndex();
             s.sourceId =  event->getSourceNodeID();
-            s.name = event->getName() + " " + String(event->getSourceIndex()+1);
+            s.name = "Tracking source " + String(event->getSourceIndex()+1);
             s.color = String("None");
             s.x_pos = -1;
             s.y_pos = -1;
@@ -302,7 +302,7 @@ void TrackingStimulator::process(AudioSampleBuffer&)
     {
 
         m_currentTime = Time::currentTimeMillis();
-        m_timePassed = float(m_currentTime - m_previousTime)/1000.0; // in seconds
+        m_timePassed = float(m_currentTime - m_previousTime) / 1000.f; // in seconds
 
         lock.enter();
 
@@ -314,39 +314,36 @@ void TrackingStimulator::process(AudioSampleBuffer&)
             // Check if timePassed >= latency
 
             float stim_interval;
-            if (m_isUniform) //uniform
-                stim_interval = float(1/m_stimFreq);
+            if (m_isUniform)  {
+                stim_interval = float(1.f / m_stimFreq);
+            }
             else                     //gaussian
             {
                 int circleIn = isPositionWithinCircles(m_x, m_y);
                 float dist_norm = m_circles[circleIn].distanceFromCenter(m_x, m_y) / m_circles[circleIn].getRad();
-                std::cout << "Norm dist: "  << dist_norm << endl;
-
                 float k = -1.0 / std::log(m_stimSD);
-
                 float freq_gauss = m_stimFreq*std::exp(-pow(dist_norm,2)/k);
                 stim_interval = float(1/freq_gauss);
-                std::cout << "Gauss_freq:" << endl;
-                std::cout << freq_gauss << endl;
-                std::cout << "Stim_interval:" << endl;
-                std::cout << stim_interval << endl;
             }
 
+            float stimulationProbability = m_timePassed / stim_interval;
+            std::uniform_real_distribution<float> distribution(0.0, 1.0);
+            float randomNumber = distribution(generator);
 
-            if (m_timePassed >= stim_interval)
-            {
+            if (stimulationProbability > 1)
+                std::cout << "WARNING: The tracking stimulation frequency is higher than the sampling frequency." << std::endl;
+
+            if (randomNumber < stimulationProbability) {
                 int64 timestamp = CoreServices::getGlobalTimestamp();
                 setTimestampAndSamples(timestamp, 0);
                 uint8 ttlData = 1 << m_outputChan;
                 const EventChannel* chan = getEventChannel(getEventChannelIndex(0, getNodeId()));
                 TTLEventPtr event = TTLEvent::createTTLEvent(chan, timestamp, &ttlData, sizeof(uint8), m_outputChan);
                 addEvent(chan, event, 0);
-
-                m_previousTime = Time::currentTimeMillis();
-                m_timePassed = 0;
             }
-
         }
+
+        m_previousTime = m_currentTime;
 
         lock.exit();
     }
@@ -361,14 +358,9 @@ void TrackingStimulator::handleEvent (const EventChannel* eventInfo, const MidiM
 
     BinaryEventPtr evtptr = BinaryEvent::deserializeFromMessage(event, eventInfo);
 
-    //    if(event.getRawDataSize() != sizeof(TrackingData) + 18) { // TODO figure out why it is + 18
-    //        cout << "Position tracker got wrong event size x,y,width,height was expected: " << event.getRawDataSize() << endl;
-    //        return;
-    //    }
-
     int nodeId = evtptr->getSourceID();
     int evtId = evtptr->getSourceIndex();
-    const auto *message = reinterpret_cast<const TrackingData *>(evtptr->getBinaryDataPointer());
+    const auto *position = reinterpret_cast<const TrackingPosition *>(evtptr->getBinaryDataPointer());
 
     int nSources = sources.size ();
 
@@ -377,15 +369,15 @@ void TrackingStimulator::handleEvent (const EventChannel* eventInfo, const MidiM
         TrackingSources& currentSource = sources.getReference (i);
         if (currentSource.sourceId == nodeId && evtId == currentSource.eventIndex)
         {
-            if(!(message->position.x != message->position.x || message->position.y != message->position.y) && message->position.x != 0 && message->position.y != 0)
+            if(!(position->x != position->x || position->y != position->y) && position->x != 0 && position->y != 0)
             {
-                currentSource.x_pos = message->position.x;
-                currentSource.y_pos = message->position.y;
+                currentSource.x_pos = position->x;
+                currentSource.y_pos = position->y;
             }
-            if(!(message->position.width != message->position.width || message->position.height != message->position.height))
+            if(!(position->width != position->width || position->height != position->height))
             {
-                currentSource.width = message->position.width;
-                currentSource.height = message->position.height;
+                currentSource.width = position->width;
+                currentSource.height = position->height;
             }
 
             String sourceColor;
@@ -495,25 +487,10 @@ bool TrackingStimulator::saveParametersXml()
     }
     // save stimulator conf
     XmlElement* stim = new XmlElement("STIMULATION");
-//    for (int i=0; i<4; i++)
-//    {
-//        XmlElement* stim = new XmlElement(String("stim_")+=String(i+1));
-//        stim->setAttribute("id", i);
-        stim->setAttribute("freq", m_stimFreq);
-        stim->setAttribute("sd", m_stimSD);
-        stim->setAttribute("uniform-gaussian", m_isUniform);
-        //        chan->setAttribute("biphasic", m_isBiphasic[i]);
-        //        chan->setAttribute("negative-positive", m_negativeFirst[i]);
-        //        chan->setAttribute("phase", m_phaseDuration[i]);
-        //        chan->setAttribute("interphase", m_interPhaseInt[i]);
-        //        chan->setAttribute("voltage", m_voltage[i]);
-        //        chan->setAttribute("repetitions", m_repetitions[i]);
-        //        chan->setAttribute("trainduration", m_trainDuration[i]);
-        //        chan->setAttribute("interpulse", m_interPulseInt[i]);
 
-//        channels->addChildElement(chan);
-//    }
-
+    stim->setAttribute("freq", m_stimFreq);
+    stim->setAttribute("sd", m_stimSD);
+    stim->setAttribute("uniform-gaussian", m_isUniform);
 
     state->addChildElement(circles);
     state->addChildElement(stim);
@@ -562,39 +539,14 @@ bool TrackingStimulator::loadParametersXml(File fileToLoad)
             }
             if (element->hasTagName("STIMULATION"))
             {
+                double freq = element->getDoubleAttribute("freq");
+                double sd = element->getDoubleAttribute("sd");
+                int uni = element->getIntAttribute("uniform-gaussian");
 
-//                forEachXmlChildElement(*element, element2)
-//                {
-//                    int id = element2->getIntAttribute("id");
-//                    if (id<4) //pulse pal channels
-//                    {
-                        double freq = element->getDoubleAttribute("freq");
-                        double sd = element->getDoubleAttribute("sd");
-                        int uni = element->getIntAttribute("uniform-gaussian");
-                        //                        int biphasic = element2->getIntAttribute("biphasic");
-                        //                        int negfirst = element2->getIntAttribute("negative-positive");
-                        //                        double phase = element2->getDoubleAttribute("phase");
-                        //                        double interphase = element2->getDoubleAttribute("interphase");
-                        //                        double voltage = element2->getDoubleAttribute("voltage");
-                        //                        int rep = element2->getIntAttribute("repetitions");
-                        //                        double interpulse = element2->getDoubleAttribute("interpulse");
-                        //                        double trainduration = element2->getDoubleAttribute("trainduration");
+                m_stimFreq = freq;
+                m_stimSD = sd;
+                m_isUniform = uni;
 
-                        m_stimFreq = freq;
-                        m_stimSD = sd;
-                        m_isUniform = uni;
-                        //                        m_isBiphasic[id] = biphasic;
-                        //                        m_negativeFirst[id] = negfirst;
-                        //                        m_phaseDuration[id] = phase;
-                        //                        m_interPhaseInt[id] = interphase;
-                        //                        m_voltage[id] = voltage;
-                        //                        m_repetitions[id] = rep;
-                        //                        m_interPulseInt[id] = interpulse;
-                        //                        m_trainDuration[id] = trainduration;
-//                    }
-
-//                }
-//                break;
             }
         }
         return true;
@@ -688,15 +640,6 @@ void TrackingStimulator::saveCustomParametersToXml(XmlElement *parentElement)
         chan->setAttribute("freq", m_stimFreq);
         chan->setAttribute("sd", m_stimSD);
         chan->setAttribute("uniform-gaussian", m_isUniform);
-        //        chan->setAttribute("biphasic", m_isBiphasic[i]);
-        //        chan->setAttribute("negative-positive", m_negativeFirst[i]);
-        //        chan->setAttribute("phase", m_phaseDuration[i]);
-        //        chan->setAttribute("interphase", m_interPhaseInt[i]);
-        //        chan->setAttribute("voltage", m_voltage[i]);
-        //        chan->setAttribute("repetitions", m_repetitions[i]);
-        //        chan->setAttribute("trainduration", m_trainDuration[i]);
-        //        chan->setAttribute("interpulse", m_interPulseInt[i]);
-
         channels->addChildElement(chan);
     }
 
@@ -743,26 +686,10 @@ void TrackingStimulator::loadCustomParametersFromXml()
                                 double freq = element2->getDoubleAttribute("freq");
                                 double sd = element2->getDoubleAttribute("sd");
                                 int uni = element2->getIntAttribute("uniform-gaussian");
-                                //                                int biphasic = element2->getIntAttribute("biphasic");
-                                //                                int negfirst = element2->getIntAttribute("negative-positive");
-                                //                                double phase = element2->getDoubleAttribute("phase");
-                                //                                double interphase = element2->getDoubleAttribute("interphase");
-                                //                                double voltage = element2->getDoubleAttribute("voltage");
-                                //                                int rep = element2->getIntAttribute("repetitions");
-                                //                                double interpulse = element2->getDoubleAttribute("interpulse");
-                                //                                double trainduration = element2->getDoubleAttribute("trainduration");
 
                                 m_stimFreq = freq;
                                 m_stimSD = sd;
                                 m_isUniform = uni;
-                                //                                m_isBiphasic[id] = biphasic;
-                                //                                m_negativeFirst[id] = negfirst;
-                                //                                m_phaseDuration[id] = phase;
-                                //                                m_interPhaseInt[id] = interphase;
-                                //                                m_voltage[id] = voltage;
-                                //                                m_repetitions[id] = rep;
-                                //                                m_interPulseInt[id] = interpulse;
-                                //                                m_trainDuration[id] = trainduration;
                             }
 
                         }

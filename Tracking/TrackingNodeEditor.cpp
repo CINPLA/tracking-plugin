@@ -40,7 +40,7 @@ TrackingNodeEditor::TrackingNodeEditor (GenericProcessor* parentNode, bool useDe
 {
     desiredWidth = 220;
 
-    TrackingNode* processor = (TrackingNode*)getProcessor();
+    TrackingNode* processor = (TrackingNode*) getProcessor();
 
     sourceSelector = new ComboBox();
     sourceSelector->setBounds(45,30,130,20);
@@ -89,15 +89,15 @@ TrackingNodeEditor::TrackingNodeEditor (GenericProcessor* parentNode, bool useDe
     colorLabel = new Label ("Color", "Color:");
     colorLabel->setBounds (10, 105, 140, 25);
     addAndMakeVisible (colorLabel);
-    String defaultColor = "red";
-    labelColor = new Label ("Color", String (defaultColor));
-    labelColor->setBounds (80, 110, 80, 18);
-    labelColor->setFont (Font ("Default", 15, Font::plain));
-    labelColor->setColour (Label::textColourId, Colours::white);
-    labelColor->setColour (Label::backgroundColourId, Colours::grey);
-    labelColor->setEditable (true);
-    labelColor->addListener (this);
-    addAndMakeVisible (labelColor);
+
+    colorSelector = new ComboBox();
+    colorSelector->setBounds(80, 110, 80, 18);
+    colorSelector->addListener(this);
+
+    for (int i = 0; i < MAX_SOURCES; i++)
+        colorSelector->addItem(color_palette[i], i+1);
+    colorSelector->setSelectedId(1, dontSendNotification);
+    addAndMakeVisible(colorSelector);
 }
 
 TrackingNodeEditor::~TrackingNodeEditor()
@@ -113,26 +113,31 @@ void TrackingNodeEditor::labelTextChanged (Label* label)
     {
         Value val = label->getTextValue();
         p->setAddress (selectedSource, val.getValue());
+        p->setColor(selectedSource, color_palette[colorSelector->getSelectedId()-1]);
     }
 
     if (label == labelPort)
     {
         Value val = label->getTextValue();
         p->setPort (selectedSource, val.getValue());
-    }
-
-    if (label == labelColor)
-    {
-        Value val = label->getTextValue();
-        p->setColor (selectedSource, val.getValue());
+        p->setColor(selectedSource, color_palette[colorSelector->getSelectedId()-1]);
     }
     updateSettings();
 }
 
 void TrackingNodeEditor::comboBoxChanged(ComboBox* c)
 {
-    selectedSource = c->getSelectedId() - 1;
-    updateLabels();
+    if (c == sourceSelector)
+    {
+        selectedSource = c->getSelectedId() - 1;
+        updateLabels();
+    }
+    else if (c == colorSelector)
+    {
+        TrackingNode* p = (TrackingNode*) getProcessor();
+        String color = color_palette[c->getSelectedId() - 1];
+        p->setColor (selectedSource, color);
+    }
 }
 
 void TrackingNodeEditor::updateLabels()
@@ -143,7 +148,12 @@ void TrackingNodeEditor::updateLabels()
     TrackingNode* p = (TrackingNode*) getProcessor();
     labelAdr->setText(p->getAddress(selectedSource), dontSendNotification);
     labelPort->setText(String(p->getPort(selectedSource)), dontSendNotification);
-    labelColor->setText(p->getColor(selectedSource), dontSendNotification);
+
+    for (int i=0; i < MAX_SOURCES; i++)
+    {
+        if (color_palette[i].compare(p->getColor(selectedSource))==0)
+            colorSelector->setSelectedId(i+1);
+    }
 }
 
 void TrackingNodeEditor::buttonEvent(Button* button)
@@ -163,7 +173,7 @@ void TrackingNodeEditor::addTrackingSource()
     std::cout << "Adding source" << std::endl;
     TrackingNode* p = (TrackingNode*) getProcessor();
 
-    p->addSource(DEF_PORT, DEF_ADDRESS, DEF_COLOR);
+    p->addSource();
     updateSettings();
     sourceSelector->setSelectedId(sourceSelector->getNumItems());
     selectedSource = sourceSelector->getSelectedId() - 1;
@@ -186,7 +196,7 @@ void TrackingNodeEditor::updateSettings()
     sourceSelector->clear();
 
     for (int i = 0; i < p->getNSources(); i++)
-        sourceSelector->addItem("Source " + String(i+1), i+1);
+        sourceSelector->addItem("Tracking source " + String(i+1), i+1);
 
     sourceSelector->setSelectedId(selectedSource+1);
     updateLabels();

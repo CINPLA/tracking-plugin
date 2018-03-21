@@ -94,13 +94,18 @@ private:
     ScopedPointer<Label> sourcesLabel;
 
     std::map<String, Colour> color_palette = {
-        { "red", Colour(200, 30, 30) },
-        { "green", Colour(30, 200, 30) },
-        { "blue", Colour(30, 30, 200) },
-        { "cyan", Colour(30, 200, 200) },
-        { "magenta", Colour(200, 30, 200) },
-        { "yellow", Colour(200, 200, 30) },
-        { "grey", Colour(100, 100, 100) },
+        { "red", Colours::red },
+        { "green", Colours::green },
+        { "blue", Colours::blue },
+        { "cyan", Colours::cyan },
+        { "magenta", Colours::magenta },
+        { "yellow", Colours::yellow },
+        { "orange", Colours::orange },
+        { "pink", Colours::pink },
+        { "grey", Colours::grey },
+        { "violet", Colours::violet },
+        { "yellow", Colours::yellow },
+        { "white", Colours::white },
         { "background", Colour(0, 18, 43) }
     };
 
