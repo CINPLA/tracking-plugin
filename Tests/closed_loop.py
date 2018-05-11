@@ -6,10 +6,13 @@ import quantities as pq
 from exana import tracking as tr
 import neo
 
-processor = 0
 
-oe_folder_uni = os.path.join(os.getcwd(), 'OE_Data/closed_loop/test_no_pulsepal_uni_2018-01-12_16-33-49')
-oe_folder_gauss = os.path.join(os.getcwd(), 'OE_Data/closed_loop/test_no_pulsepal_gauss_2018-01-12_16-23-31')
+oe_folder_uni = os.path.join(os.getcwd(), 'OE_Data/closed_loop/closed_loop_uniform_2018-02-09_23-05-54')
+# oe_folder_gauss = os.path.join(os.getcwd(), 'OE_Data/closed_loop/closed_loop_gaussi_2018-02-09_22-30-33')
+oe_folder_gauss = os.path.join(os.getcwd(), 'OE_Data/closed_loop/tests/closed_loop_gauss_2018-02-10_20-56-42')
+
+
+source='fpga'
 
 file_uni = pyopenephys.File(oe_folder_uni)
 exp1 = file_uni.experiments[0]
@@ -17,8 +20,16 @@ rec1 = exp1.recordings[0]
 
 tracking_uni = rec1.tracking
 events_uni = rec1.events
+for ev in events_uni:
+    if ev.processor == 'Rhythm_FPGA':
+        ev_fpga_uni = ev.times[::2]
+    else:
+        ev_stim_uni = ev.times
 
-sptr_uni = neo.SpikeTrain(events_uni[processor].times, t_stop=events_uni[processor].times[-1])
+if source=='fpga':
+    sptr_uni = neo.SpikeTrain(ev_fpga_uni, t_stop=ev_fpga_uni[-1])
+else:
+    sptr_uni = neo.SpikeTrain(ev_stim_uni, t_stop=ev_stim_uni[-1])
 
 file_gauss = pyopenephys.File(oe_folder_gauss)
 exp1 = file_gauss.experiments[0]
@@ -26,19 +37,28 @@ rec1 = exp1.recordings[0]
 
 tracking_gauss = rec1.tracking
 events_gauss = rec1.events
+for ev in events_gauss:
+    if ev.processor == 'Rhythm_FPGA':
+        ev_fpga_gauss = ev.times[::2]
+    else:
+        ev_stim_gauss = ev.times
 
-sptr_gauss = neo.SpikeTrain(events_gauss[processor].times, t_stop=events_gauss[processor].times[-1])
+if source=='fpga':
+    sptr_gauss = neo.SpikeTrain(ev_stim_gauss, t_stop=ev_fpga_gauss[-1])
+else:
+    sptr_gauss = neo.SpikeTrain(ev_stim_gauss, t_stop=ev_fpga_gauss[-1])
 
 x_uni = tracking_uni[0].x * pq.m
 y_uni = tracking_uni[0].y * pq.m
-t_uni = tracking_uni[0].times # - tracking_uni[0].times[0]
-x_gauss = tracking_gauss[0].x * pq.m
-y_gauss = tracking_gauss[0].y * pq.m
-t_gauss = tracking_gauss[0].times# - tracking_gauss[0].times[0]
+t_uni = tracking_uni[0].times
 
-rate_map_uni = tr.spatial_rate_map(x_uni, y_uni, t_uni, sptr_uni, binsize=0.05*pq.m, smoothing=0.04, convolve=True,
+x_gauss = tracking_gauss[0].x[1:] * pq.m
+y_gauss = tracking_gauss[0].y[1:] * pq.m
+t_gauss = tracking_gauss[0].times[1:]
+
+rate_map_uni = tr.spatial_rate_map(x_uni, y_uni, t_uni, sptr_uni, binsize=0.05*pq.m, smoothing=0.02, convolve=True,
                                    mask_unvisited=False)
-rate_map_gauss = tr.spatial_rate_map(x_gauss, y_gauss, t_gauss, sptr_gauss, binsize=0.05*pq.m, smoothing=0.04, convolve=True,
+rate_map_gauss = tr.spatial_rate_map(x_gauss, y_gauss, t_gauss, sptr_gauss, binsize=0.05*pq.m, smoothing=0.02, convolve=True,
                                      mask_unvisited=False)
 
 bxl = byl = 1*pq.m
@@ -85,6 +105,20 @@ axes[1][1].set_title('%.2f Hz' % np.nanmax(rate_map_gauss))
 fig_tot.tight_layout()
 
 
+# #TEST
+# import os
+# import pyopenephys
+# import pylab as plt
+#
+# oe_folder = '/home/alessio/Documents/Codes/open-ephys/plugins/tracking-plugins/Tests/closed_loop_gauss_2018-02-09_16-47-28'
+#
+# file = pyopenephys.File(oe_folder)
+# exp1 = file.experiments[0]
+# rec1 = exp1.recordings[0]
+#
+# tracking= rec1.tracking
+#
+# plt.plot(tracking[0].times)
 
 
 plt.ion()
