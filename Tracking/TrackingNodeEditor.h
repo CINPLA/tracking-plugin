@@ -53,8 +53,7 @@ public:
     void updateLabels();
 
 private:
-    String color_palette[MAX_SOURCES] = {"red", "green", "blue", "magenta", "cyan",
-                                         "orange", "pink", "grey", "violet", "yellow"};
+	String color_palette[MAX_SOURCES];
 
     ScopedPointer<ComboBox> sourceSelector;
     ScopedPointer<UtilityButton> plusButton;

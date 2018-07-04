@@ -40,6 +40,17 @@ TrackingNodeEditor::TrackingNodeEditor (GenericProcessor* parentNode, bool useDe
 {
     desiredWidth = 220;
 
+	color_palette[0] = "red";
+	color_palette[1] = "green";
+	color_palette[2] = "blue";
+	color_palette[3] = "magenta";
+	color_palette[4] = "cyan";
+	color_palette[5] = "orange";
+	color_palette[6] = "pink";
+	color_palette[7] = "grey";
+	color_palette[8] = "violet";
+	color_palette[9] = "yellow";
+
     TrackingNode* processor = (TrackingNode*) getProcessor();
 
     sourceSelector = new ComboBox();

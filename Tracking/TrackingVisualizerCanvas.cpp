@@ -75,6 +75,19 @@ TrackingVisualizerCanvas::TrackingVisualizerCanvas(TrackingVisualizer *TrackingV
 {
     initButtonsAndLabels();
     startCallbacks();
+	color_palette["red"] = Colours::red;
+	color_palette["green"] = Colours::green;
+	color_palette["blue"] = Colours::blue;
+	color_palette["cyan"] = Colours::cyan;
+	color_palette["magenta"] = Colours::magenta;
+	color_palette["yellow"] = Colours::yellow;
+	color_palette["orange"] = Colours::orange;
+	color_palette["pink"] = Colours::pink;
+	color_palette["grey"] = Colours::grey;
+	color_palette["violet"] = Colours::violet;
+	color_palette["yellow"] = Colours::yellow;
+	color_palette["white"] = Colours::white;
+	color_palette["background"] = Colour(0, 18, 43);
 }
 
 TrackingVisualizerCanvas::~TrackingVisualizerCanvas()
