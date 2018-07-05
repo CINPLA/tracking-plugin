@@ -61,7 +61,7 @@ TrackingNode::TrackingNode()
 
 TrackingNode::~TrackingNode()
 {
-    for (int i; i< trackingModules.size (); i++)
+    for (int i = 0; i< trackingModules.size (); i++)
     {
         auto *current = trackingModules.getReference(i);
         std::cout << "Removing source " << i << std::endl;

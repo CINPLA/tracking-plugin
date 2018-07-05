@@ -75,6 +75,7 @@ TrackingVisualizerCanvas::TrackingVisualizerCanvas(TrackingVisualizer *TrackingV
 {
     initButtonsAndLabels();
     startCallbacks();
+
 	color_palette["red"] = Colours::red;
 	color_palette["green"] = Colours::green;
 	color_palette["blue"] = Colours::blue;

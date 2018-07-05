@@ -36,8 +36,9 @@
 #include "TrackingStimulatorEditor.h"
 #include "TrackingMessage.h"
 #include "serial/PulsePal.h"
-#include <random>
+
 #include <vector>
+#include <random>
 
 #define DEF_PHASE_DURATION 1
 #define DEF_INTER_PHASE 1
@@ -178,7 +179,7 @@ private:
     int64 m_previousTime;
     int64 m_currentTime;
 
-	default_random_engine generator;
+    default_random_engine generator;
 
 
     // Time sim position

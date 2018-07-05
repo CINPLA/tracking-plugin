@@ -53,8 +53,7 @@ public:
     void updateLabels();
 
 private:
-	String color_palette[MAX_SOURCES];
-
+	Array<String> color_palette;
     ScopedPointer<ComboBox> sourceSelector;
     ScopedPointer<UtilityButton> plusButton;
     ScopedPointer<UtilityButton> minusButton;
