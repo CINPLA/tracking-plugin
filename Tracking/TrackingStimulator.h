@@ -35,7 +35,6 @@
 #include <ProcessorHeaders.h>
 #include "TrackingStimulatorEditor.h"
 #include "TrackingMessage.h"
-#include "serial/PulsePal.h"
 
 #include <vector>
 #include <random>
@@ -127,7 +126,7 @@ public:
     int getNSources() const;
     TrackingSources& getTrackingSource(int s) const;
 
-    vector<Circle> getCircles();
+    std::vector<Circle> getCircles();
     void addCircle(Circle c);
     void editCircle(int ind, float x, float y, float rad, bool on);
     void deleteCircle(int ind);
@@ -179,7 +178,7 @@ private:
     int64 m_previousTime;
     int64 m_currentTime;
 
-    default_random_engine generator;
+    std::default_random_engine generator;
 
 
     // Time sim position
@@ -203,7 +202,7 @@ private:
     bool m_simulateTrajectory;
     bool m_colorUpdated;
 
-    vector<Circle> m_circles;
+    std::vector<Circle> m_circles;
     int m_selectedCircle;
 
     // Stimulation params

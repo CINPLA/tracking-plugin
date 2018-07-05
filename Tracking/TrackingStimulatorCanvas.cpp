@@ -616,7 +616,7 @@ void TrackingStimulatorCanvas::initButtons()
     // Create invisible circle toggle button
     for (int i = 0; i<MAX_CIRCLES; i++)
     {
-        newcircButton = new UtilityButton(to_string(i+1), Font("Small Text", 13, Font::plain));
+        newcircButton = new UtilityButton(String(i+1), Font("Small Text", 13, Font::plain));
         newcircButton->setRadius(5.0f);
         newcircButton->addListener(this);
         newcircButton->setClickingTogglesState(true);

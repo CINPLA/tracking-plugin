@@ -162,6 +162,7 @@ void TrackingNode::setPort (int i, int port)
         try
         {
             module = new TrackingModule(port, address, color, this);
+			trackingModules.set(i, module);
         }
         catch (const std::runtime_error& e)
         {
@@ -172,13 +173,12 @@ void TrackingNode::setPort (int i, int port)
 
 int TrackingNode::getPort(int i)
 {
-    if (i < trackingModules.size ())
-    {
-        auto *module = trackingModules.getReference (i);
-        return module->m_port;
-    }
-    else
-        return -1;
+	if (i < 0 || i >= trackingModules.size()) {
+		return -1;
+	}
+
+    auto *module = trackingModules.getReference (i);
+    return module->m_port;
 }
 
 void TrackingNode::setAddress (int i, String address)
@@ -198,6 +198,7 @@ void TrackingNode::setAddress (int i, String address)
         try
         {
             module = new TrackingModule(port, address, color, this);
+			trackingModules.set(i, module);
         }
         catch (const std::runtime_error& e)
         {
@@ -209,7 +210,7 @@ void TrackingNode::setAddress (int i, String address)
 String TrackingNode::getAddress(int i)
 {
     if (i < 0 || i >= trackingModules.size ()) {
-        return "";
+		return String("");
     }
 
     auto *module = trackingModules.getReference (i);
@@ -224,17 +225,18 @@ void TrackingNode::setColor (int i, String color)
 	}
 	auto *module = trackingModules.getReference(i);
 	module->m_color = color;
+	trackingModules.set(i, module);
+
 }
 
 String TrackingNode::getColor(int i)
 {
-    if (i < trackingModules.size ())
-    {
-        auto *module = trackingModules.getReference (i);
-        return module->m_color;
-    }
-    else
-        return "";
+	if (i < 0 || i >= trackingModules.size()) {
+		return String("");
+	}
+    
+    auto *module = trackingModules.getReference (i);
+    return module->m_color;
 }
 
 void TrackingNode::process (AudioSampleBuffer&)
