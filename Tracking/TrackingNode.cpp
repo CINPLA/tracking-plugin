@@ -218,11 +218,12 @@ String TrackingNode::getAddress(int i)
 
 void TrackingNode::setColor (int i, String color)
 {
-    if (i < trackingModules.size ())
-    {
-        auto *module = trackingModules.getReference (i);
-        module->m_color = color;
-    }
+	if (i < 0 || i >= trackingModules.size())
+	{
+		return;
+	}
+	auto *module = trackingModules.getReference(i);
+	module->m_color = color;
 }
 
 String TrackingNode::getColor(int i)
