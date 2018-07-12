@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <WorkflowBuilder Version="2.3.0">
-  <Workflow xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:q1="clr-namespace:Bonsai.Dsp;assembly=Bonsai.Dsp" xmlns:q2="clr-namespace:Bonsai.Vision;assembly=Bonsai.Vision" xmlns:q3="clr-namespace:Bonsai.PointGrey;assembly=Bonsai.PointGrey" xmlns:q4="clr-namespace:Bonsai.Osc;assembly=Bonsai.Osc" xmlns:q5="clr-namespace:Bonsai.Scripting;assembly=Bonsai.Scripting" xmlns="https://horizongir.org/bonsai">
+  <Workflow xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:q1="clr-namespace:Bonsai.Dsp;assembly=Bonsai.Dsp" xmlns:q2="clr-namespace:Bonsai.Vision;assembly=Bonsai.Vision" xmlns:q3="clr-namespace:Bonsai.Osc;assembly=Bonsai.Osc" xmlns:q4="clr-namespace:Bonsai.Scripting;assembly=Bonsai.Scripting" xmlns="https://horizongir.org/bonsai">
     <Nodes>
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="q1:Split" />
@@ -113,14 +113,14 @@
       </Expression>
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="q2:Threshold">
-          <q2:ThresholdValue>93</q2:ThresholdValue>
+          <q2:ThresholdValue>64</q2:ThresholdValue>
           <q2:MaxValue>255</q2:MaxValue>
           <q2:ThresholdType>Binary</q2:ThresholdType>
         </Combinator>
       </Expression>
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="q2:Threshold">
-          <q2:ThresholdValue>225</q2:ThresholdValue>
+          <q2:ThresholdValue>11</q2:ThresholdValue>
           <q2:MaxValue>255</q2:MaxValue>
           <q2:ThresholdType>Binary</q2:ThresholdType>
         </Combinator>
@@ -162,22 +162,9 @@
         <Combinator xsi:type="q2:LargestBinaryRegion" />
       </Expression>
       <Expression xsi:type="Combinator">
-        <Combinator xsi:type="q2:Crop">
-          <q2:RegionOfInterest>
-            <q2:X>0</q2:X>
-            <q2:Y>0</q2:Y>
-            <q2:Width>1280</q2:Width>
-            <q2:Height>960</q2:Height>
-          </q2:RegionOfInterest>
-        </Combinator>
-      </Expression>
-      <Expression xsi:type="MemberSelector">
-        <Selector>Source.Image</Selector>
-      </Expression>
-      <Expression xsi:type="Combinator">
-        <Combinator xsi:type="q3:FlyCapture">
-          <q3:Index>0</q3:Index>
-          <q3:ColorProcessing>Default</q3:ColorProcessing>
+        <Combinator xsi:type="q2:CameraCapture">
+          <q2:Index>0</q2:Index>
+          <q2:CaptureProperties />
         </Combinator>
       </Expression>
       <Expression xsi:type="Combinator">
@@ -192,23 +179,23 @@
       <Expression xsi:type="MemberSelector">
         <Selector>Source.Size</Selector>
       </Expression>
-      <Expression xsi:type="q4:SendMessage">
-        <q4:Connection>RedPort</q4:Connection>
-        <q4:Address>/red</q4:Address>
+      <Expression xsi:type="q3:SendMessage">
+        <q3:Connection>RedPort</q3:Connection>
+        <q3:Address>/red</q3:Address>
       </Expression>
-      <Expression xsi:type="q4:SendMessage">
-        <q4:Connection>GreenPort</q4:Connection>
-        <q4:Address>/green</q4:Address>
+      <Expression xsi:type="q3:SendMessage">
+        <q3:Connection>GreenPort</q3:Connection>
+        <q3:Address>/green</q3:Address>
       </Expression>
       <Expression xsi:type="MemberSelector">
-        <Selector>Source.RedX,Source.RedY,Source.Width,Source.Height</Selector>
+        <Selector>Source.RedX,Source.RedY,Source.Height,Source.Width</Selector>
       </Expression>
       <Expression xsi:type="MemberSelector">
         <Selector>Source.GreenX,Source.GreenY,Source.Width,Source.Height</Selector>
       </Expression>
-      <Expression xsi:type="q5:ExpressionTransform">
-        <q5:Expression>new(single(Item1.X / Item3.Width) as GreenX, single(Item1.Y / Item3.Height) as GreenY, single(Item2.X / Item3.Width) as RedX,
- single(Item2.Y / Item3.Height) as RedY, single(Item3.Height) as Height, single(Item3.Width) as Width)</q5:Expression>
+      <Expression xsi:type="q4:ExpressionTransform">
+        <q4:Expression>new(single(Item1.X / Item3.Width) as GreenX, single(Item1.Y / Item3.Height) as GreenY, single(Item2.X / Item3.Width) as RedX,
+ single(Item2.Y / Item3.Height) as RedY, single(Item3.Height) as Height, single(Item3.Width) as Width)</q4:Expression>
       </Expression>
     </Nodes>
     <Edges>
@@ -264,12 +251,12 @@
       </Edge>
       <Edge>
         <From>9</From>
-        <To>15</To>
+        <To>13</To>
         <Label>Source1</Label>
       </Edge>
       <Edge>
         <From>10</From>
-        <To>16</To>
+        <To>14</To>
         <Label>Source1</Label>
       </Edge>
       <Edge>
@@ -279,12 +266,12 @@
       </Edge>
       <Edge>
         <From>11</From>
-        <To>17</To>
+        <To>15</To>
         <Label>Source1</Label>
       </Edge>
       <Edge>
         <From>12</From>
-        <To>11</To>
+        <To>20</To>
         <Label>Source1</Label>
       </Edge>
       <Edge>
@@ -294,23 +281,23 @@
       </Edge>
       <Edge>
         <From>14</From>
-        <To>22</To>
-        <Label>Source1</Label>
-      </Edge>
-      <Edge>
-        <From>15</From>
-        <To>14</To>
-        <Label>Source1</Label>
-      </Edge>
-      <Edge>
-        <From>16</From>
-        <To>14</To>
+        <To>12</To>
         <Label>Source2</Label>
       </Edge>
       <Edge>
-        <From>17</From>
-        <To>14</To>
+        <From>15</From>
+        <To>12</To>
         <Label>Source3</Label>
+      </Edge>
+      <Edge>
+        <From>18</From>
+        <To>16</To>
+        <Label>Source1</Label>
+      </Edge>
+      <Edge>
+        <From>19</From>
+        <To>17</To>
+        <Label>Source1</Label>
       </Edge>
       <Edge>
         <From>20</From>
@@ -318,18 +305,8 @@
         <Label>Source1</Label>
       </Edge>
       <Edge>
-        <From>21</From>
+        <From>20</From>
         <To>19</To>
-        <Label>Source1</Label>
-      </Edge>
-      <Edge>
-        <From>22</From>
-        <To>20</To>
-        <Label>Source1</Label>
-      </Edge>
-      <Edge>
-        <From>22</From>
-        <To>21</To>
         <Label>Source1</Label>
       </Edge>
     </Edges>
@@ -342,8 +319,7 @@
     <Type>Bonsai.Vision.FindContours, Bonsai.Vision, Version=2.3.0.0, Culture=neutral, PublicKeyToken=null</Type>
     <Type>Bonsai.Vision.BinaryRegionAnalysis, Bonsai.Vision, Version=2.3.0.0, Culture=neutral, PublicKeyToken=null</Type>
     <Type>Bonsai.Vision.LargestBinaryRegion, Bonsai.Vision, Version=2.3.0.0, Culture=neutral, PublicKeyToken=null</Type>
-    <Type>Bonsai.Vision.Crop, Bonsai.Vision, Version=2.3.0.0, Culture=neutral, PublicKeyToken=null</Type>
-    <Type>Bonsai.PointGrey.FlyCapture, Bonsai.PointGrey, Version=2.3.0.0, Culture=neutral, PublicKeyToken=null</Type>
+    <Type>Bonsai.Vision.CameraCapture, Bonsai.Vision, Version=2.3.0.0, Culture=neutral, PublicKeyToken=null</Type>
     <Type>Bonsai.Osc.SendMessage, Bonsai.Osc, Version=2.3.0.0, Culture=neutral, PublicKeyToken=null</Type>
     <Type>Bonsai.Scripting.ExpressionTransform, Bonsai.Scripting, Version=2.3.0.0, Culture=neutral, PublicKeyToken=null</Type>
   </ExtensionTypes>
