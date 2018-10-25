@@ -59,7 +59,7 @@ TrackingStimulator::TrackingStimulator()
 
     setProcessorType (PROCESSOR_TYPE_FILTER);
 
-    m_circles = vector<Circle>();
+    m_circles = std::vector<Circle>();
 
     m_stimFreq = DEF_FREQ;
     m_stimSD = DEF_SD;
@@ -147,7 +147,7 @@ void TrackingStimulator::setSimulateTrajectory(bool sim)
     m_simulateTrajectory = sim;
 }
 
-vector<Circle> TrackingStimulator::getCircles()
+std::vector<Circle> TrackingStimulator::getCircles()
 {
     return m_circles;
 }

@@ -93,7 +93,7 @@ private:
     ScopedPointer<UtilityButton> sameButton;
     ScopedPointer<Label> sourcesLabel;
 
-    std::map<String, Colour> color_palette = {
+    /*std::map<String, Colour> color_palette = {
         { "red", Colours::red },
         { "green", Colours::green },
         { "blue", Colours::blue },
@@ -107,7 +107,8 @@ private:
         { "yellow", Colours::yellow },
         { "white", Colours::white },
         { "background", Colour(0, 18, 43) }
-    };
+    };*/
+	std::map<String, Colour> color_palette;
 
     std::vector<TrackingPosition> m_positions[MAX_SOURCES];
     void initButtonsAndLabels();

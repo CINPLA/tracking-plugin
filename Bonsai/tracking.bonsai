@@ -177,7 +177,6 @@
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="q3:FlyCapture">
           <q3:Index>0</q3:Index>
-          <q3:ColorFormat>Bgr</q3:ColorFormat>
           <q3:ColorProcessing>Default</q3:ColorProcessing>
         </Combinator>
       </Expression>
@@ -208,7 +207,8 @@
         <Selector>Source.GreenX,Source.GreenY,Source.Width,Source.Height</Selector>
       </Expression>
       <Expression xsi:type="q5:ExpressionTransform">
-        <q5:Expression>new(Item1.X / Item3.Width as GreenX, Item1.Y / Item3.Height as GreenY, Item2.X / Item3.Width as RedX, Item2.Y / Item3.Height as RedY, Item3.Height as Height, Item3.Width as Width)</q5:Expression>
+        <q5:Expression>new(single(Item1.X / Item3.Width) as GreenX, single(Item1.Y / Item3.Height) as GreenY, single(Item2.X / Item3.Width) as RedX,
+ single(Item2.Y / Item3.Height) as RedY, single(Item3.Height) as Height, single(Item3.Width) as Width)</q5:Expression>
       </Expression>
     </Nodes>
     <Edges>

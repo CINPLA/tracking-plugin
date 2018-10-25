@@ -42,6 +42,17 @@ TrackingNodeEditor::TrackingNodeEditor (GenericProcessor* parentNode, bool useDe
 
     TrackingNode* processor = (TrackingNode*) getProcessor();
 
+	color_palette.add("red");
+	color_palette.add("green");
+	color_palette.add("blue");
+	color_palette.add("magenta");
+	color_palette.add("cyan");
+	color_palette.add("orange");
+	color_palette.add("pink");
+	color_palette.add("grey");
+	color_palette.add("violet");
+	color_palette.add("yellow");
+
     sourceSelector = new ComboBox();
     sourceSelector->setBounds(45,30,130,20);
     sourceSelector->addListener(this);
