@@ -32,8 +32,6 @@
 #include "TrackingStimulator.h"
 #include "TrackingStimulatorEditor.h"
 
-#include "../../UI/EditorViewport.h"
-
 TrackingStimulator::TrackingStimulator()
     : GenericProcessor("Tracking Stim")
     , m_isOn(false)
