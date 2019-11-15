@@ -157,8 +157,9 @@ void TrackingStimulatorCanvas::resized()
             circlesButton[i]->setVisible(false);
     }
 
-    uniformButton->setBounds(getWidth() - 0.2*getWidth(), 0.65*getHeight(), 0.09*getWidth(),0.03*getHeight());
-    gaussianButton->setBounds(getWidth() - 0.2*getWidth() + 0.09*getWidth(), 0.65*getHeight(), 0.09*getWidth(),0.03*getHeight());
+    uniformButton->setBounds(getWidth() - 0.2*getWidth(), 0.65*getHeight(), 0.06*getWidth(),0.03*getHeight());
+    gaussianButton->setBounds(getWidth() - 0.2*getWidth() + 0.06*getWidth(), 0.65*getHeight(), 0.06*getWidth(),0.03*getHeight());
+    ttlButton->setBounds(getWidth() - 0.2*getWidth() + 0.12*getWidth(), 0.65*getHeight(), 0.06*getWidth(),0.03*getHeight());
 
     availableChans->setBounds(getWidth() - 0.2*getWidth(), 0.05*getHeight(), 0.18*getWidth(),0.04*getHeight());
     outputChans->setBounds(getWidth() - 0.2*getWidth(), 0.15*getHeight(), 0.18*getWidth(),0.04*getHeight());
@@ -176,6 +177,7 @@ void TrackingStimulatorCanvas::resized()
 
     fmaxLabel->setBounds(getWidth() - 0.2*getWidth(), 0.7*getHeight(), 0.1*getWidth(),0.04*getHeight());
     sdevLabel->setBounds(getWidth() - 0.2*getWidth(), 0.75*getHeight(), 0.1*getWidth(),0.04*getHeight());
+    durationLabel->setBounds(getWidth() - 0.2*getWidth(), 0.8*getHeight(), 0.1*getWidth(),0.04*getHeight());
 
     // Edit Labels
     cxEditLabel->setBounds(getWidth() - 0.14*getWidth(), 0.35*getHeight(), 0.06*getWidth(),0.04*getHeight());
@@ -184,6 +186,7 @@ void TrackingStimulatorCanvas::resized()
 
     fmaxEditLabel->setBounds(getWidth() - 0.1*getWidth(), 0.7*getHeight(), 0.08*getWidth(),0.04*getHeight());
     sdevEditLabel->setBounds(getWidth() - 0.1*getWidth(), 0.75*getHeight(), 0.08*getWidth(),0.04*getHeight());
+    durationEditLabel->setBounds(getWidth() - 0.1*getWidth(), 0.8*getHeight(), 0.08*getWidth(),0.04*getHeight());
     refresh();
 }
 
@@ -334,14 +337,19 @@ void TrackingStimulatorCanvas::buttonClicked(Button* button)
             if (gaussianButton->getToggleState()==true)
             {
                 gaussianButton->triggerClick();
-                sdevLabel->setVisible(false);
-                sdevEditLabel->setVisible(false);
             }
-
-            processor->setIsUniform(true);
+            if (ttlButton->getToggleState()==true)
+            {
+                ttlButton->triggerClick();
+            }
+            fmaxLabel->setVisible(true);
+            fmaxEditLabel->setVisible(true);
+            sdevLabel->setVisible(false);
+            sdevEditLabel->setVisible(false);
+            processor->setStimMode(uniform);
         }
         else
-            if (gaussianButton->getToggleState()==false)
+            if (gaussianButton->getToggleState()==false && ttlButton->getToggleState()==false)
             {
                 gaussianButton->triggerClick();
                 sdevLabel->setVisible(true);
@@ -354,20 +362,47 @@ void TrackingStimulatorCanvas::buttonClicked(Button* button)
             if (uniformButton->getToggleState()==true)
             {
                 uniformButton->triggerClick();
-                sdevLabel->setVisible(true);
-                sdevEditLabel->setVisible(true);
             }
-
-            processor->setIsUniform(false);
+            if (ttlButton->getToggleState()==true)
+            {
+                ttlButton->triggerClick();
+            }
+            sdevLabel->setVisible(true);
+            sdevEditLabel->setVisible(true);
+            processor->setStimMode(gauss);
         }
         else
-            if (uniformButton->getToggleState()==false)
+            if (uniformButton->getToggleState()==false && ttlButton->getToggleState()==false)
             {
                 uniformButton->triggerClick();
                 sdevLabel->setVisible(false);
                 sdevEditLabel->setVisible(false);
             }
-
+    }
+    else if (button == ttlButton)
+    {
+        if (button->getToggleState()==true){
+            if (uniformButton->getToggleState()==true)
+            {
+                uniformButton->triggerClick();
+            }
+            if (gaussianButton->getToggleState()==true)
+            {
+                gaussianButton->triggerClick();
+            }
+            fmaxLabel->setVisible(false);
+            fmaxEditLabel->setVisible(false);
+            sdevLabel->setVisible(false);
+            sdevEditLabel->setVisible(false);
+            processor->setStimMode(ttl);
+        }
+        else
+            if (uniformButton->getToggleState()==false && gaussianButton->getToggleState()==false)
+            {
+                uniformButton->triggerClick();
+                sdevLabel->setVisible(false);
+                sdevEditLabel->setVisible(false);
+            }
     }
     else
     {
@@ -482,6 +517,17 @@ void TrackingStimulatorCanvas::labelTextChanged(Label *label)
             label->setText("", dontSendNotification);
         }
     }
+    if (label == durationEditLabel)
+    {
+        Value val = label->getTextValue();
+        if (int(val.getValue())>=0)
+            processor->setTtlDuration(int(val.getValue()));
+        else
+        {
+            CoreServices::sendStatusMessage("Selected values cannot be negative!");
+            label->setText("", dontSendNotification);
+        }
+    }
 }
 
 
@@ -495,14 +541,14 @@ void TrackingStimulatorCanvas::update()
     int nSources = processor->getNSources();
     std::cout << nSources << std::endl;
     int nextItem = 2;
-    availableChans->addItem("None", 1);
+    availableChans->addItem("SELECT", 1);
     for (int i = 0; i < nSources; i++)
     {
         TrackingSources& source = processor->getTrackingSource(i);
         String name = source.name;
         availableChans->addItem(name, nextItem++);
     }
-
+    availableChans->setSelectedId(processor->getSelectedSource()+2); //first is SELECT
 }
 
 void TrackingStimulatorCanvas::refresh()
@@ -609,7 +655,7 @@ void TrackingStimulatorCanvas::initButtons()
     for (int i=1; i<9; i++)
         outputChans->addItem(String(i), i);
 
-    outputChans->setSelectedId(1, dontSendNotification);
+    outputChans->setSelectedId(processor->getOutputChan() + 1, dontSendNotification);
     addAndMakeVisible(outputChans);
 
 
@@ -636,13 +682,19 @@ void TrackingStimulatorCanvas::initButtons()
     gaussianButton->setClickingTogglesState(true);
     addAndMakeVisible(gaussianButton);
 
+    ttlButton = new UtilityButton("ttl", Font("Small Text", 13, Font::plain));
+    ttlButton->setRadius(3.0f);
+    ttlButton->addListener(this);
+    ttlButton->setClickingTogglesState(true);
+    addAndMakeVisible(ttlButton);
 
     // Update button toggle state with current chan1 parameters
-    if (processor->getIsUniform())
+    if (processor->getStimMode() == uniform)
         uniformButton->triggerClick();
-    else
+    else if (processor->getStimMode() == gauss)
         gaussianButton->triggerClick();
-
+    else if (processor->getStimMode() == ttl)
+        ttlButton->triggerClick();
 }
 
 void TrackingStimulatorCanvas::initLabels()
@@ -698,10 +750,11 @@ void TrackingStimulatorCanvas::initLabels()
     sdevLabel->setFont(Font(20));
     sdevLabel->setColour(Label::textColourId, labelColour);
     addAndMakeVisible(sdevLabel);
-    if (processor->getIsUniform())
-        sdevLabel->setVisible(false);
-    else
-        sdevLabel->setVisible(true);
+
+    durationLabel = new Label("s_dur", "duration [ms]:");
+    durationLabel->setFont(Font(20));
+    durationLabel->setColour(Label::textColourId, labelColour);
+    addAndMakeVisible(durationLabel);
 
 
     // Edit Labels
@@ -729,7 +782,7 @@ void TrackingStimulatorCanvas::initLabels()
     cradEditLabel->addListener(this);
     addAndMakeVisible(cradEditLabel);
 
-    fmaxEditLabel = new Label("fmax", String(DEF_FREQ));
+    fmaxEditLabel = new Label("fmax", String(processor->getStimFreq()));
     fmaxEditLabel->setFont(Font(20));
     fmaxEditLabel->setColour(Label::textColourId, labelTextColour);
     fmaxEditLabel->setColour(Label::backgroundColourId, labelBackgroundColour);
@@ -737,14 +790,34 @@ void TrackingStimulatorCanvas::initLabels()
     fmaxEditLabel->addListener(this);
     addAndMakeVisible(fmaxEditLabel);
 
-    sdevEditLabel = new Label("sdev", String(DEF_SD));
+    sdevEditLabel = new Label("sdev", String(processor->getStimSD()));
     sdevEditLabel->setFont(Font(20));
     sdevEditLabel->setColour(Label::textColourId, labelTextColour);
     sdevEditLabel->setColour(Label::backgroundColourId, labelBackgroundColour);
     sdevEditLabel->setEditable(true);
     sdevEditLabel->addListener(this);
     addAndMakeVisible(sdevEditLabel);
-    sdevEditLabel->setVisible(false);
+
+    durationEditLabel = new Label("sdev", String(processor->getTtlDuration()));
+    durationEditLabel->setFont(Font(20));
+    durationEditLabel->setColour(Label::textColourId, labelTextColour);
+    durationEditLabel->setColour(Label::backgroundColourId, labelBackgroundColour);
+    durationEditLabel->setEditable(true);
+    durationEditLabel->addListener(this);
+    addAndMakeVisible(durationEditLabel);
+
+    if (processor->getStimMode() == gauss)
+    {
+        sdevLabel->setVisible(true);
+        sdevEditLabel->setVisible(true);
+    }
+    else
+    {
+        sdevLabel->setVisible(false);
+        sdevEditLabel->setVisible(false);
+        fmaxLabel->setVisible(false);
+        fmaxEditLabel->setVisible(false);
+    }
 }
 
 int TrackingStimulatorCanvas::getSelectedSource() const
@@ -849,7 +922,7 @@ void DisplayAxes::paint(Graphics& g){
                     // if circle is being moved or changed size, don't draw static circle
                     if (!(m_movingCircle || m_doubleClick))
                     {
-                        if (processor->getIsUniform())
+                        if (processor->getStimMode() == uniform || processor->getStimMode() == ttl)
                             g.setColour(selectedCircleColour);
                         else
                         {
@@ -862,7 +935,7 @@ void DisplayAxes::paint(Graphics& g){
                 }
                 else
                 {
-                    if (processor->getIsUniform())
+                    if (processor->getStimMode() == uniform || processor->getStimMode() == ttl)
                         g.setColour(unselectedCircleColour);
                     else
                     {
@@ -936,7 +1009,7 @@ void DisplayAxes::paint(Graphics& g){
         x = x_c - radx;
         y = y_c - rady;
 
-        if (processor->getIsUniform())
+        if (processor->getStimMode() == uniform || processor->getStimMode() == ttl)
             g.setColour(unselectedCircleColour);
         else
         {
