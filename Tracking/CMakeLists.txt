@@ -32,3 +32,7 @@ add_sources(${PLUGIN_NAME}
     TrackingVisualizerCanvas.cpp
     TrackingVisualizerCanvas.h
 )
+
+if (MSVC)
+     target_link_libraries(${PLUGIN_NAME} Ws2_32.lib Winmm.lib)
+endif()
