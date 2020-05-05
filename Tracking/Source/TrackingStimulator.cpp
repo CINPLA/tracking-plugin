@@ -53,16 +53,16 @@ TrackingStimulator::TrackingStimulator()
     , m_forward(true)
     , m_rad(0.0)
     , m_outputChan(0)
+    , m_pulseDuration(DEF_DUR)
+    , m_ttlTriggered(false)
+    , m_stimFreq(DEF_FREQ)
+    , m_stimSD(DEF_SD)
+    , m_stimMode(uniform)
 {
 
     setProcessorType (PROCESSOR_TYPE_FILTER);
 
-    m_circles = std::vector<Circle>();
-
-    m_stimFreq = DEF_FREQ;
-    m_stimSD = DEF_SD;
-    m_isUniform = 1;
-
+    m_circles = std::vector<StimCircle>();
 }
 
 TrackingStimulator::~TrackingStimulator()
@@ -145,12 +145,12 @@ void TrackingStimulator::setSimulateTrajectory(bool sim)
     m_simulateTrajectory = sim;
 }
 
-std::vector<Circle> TrackingStimulator::getCircles()
+std::vector<StimCircle> TrackingStimulator::getCircles()
 {
     return m_circles;
 }
 
-void TrackingStimulator::addCircle(Circle c)
+void TrackingStimulator::addCircle(StimCircle c)
 {
     m_circles.push_back(c);
 }
@@ -176,6 +176,11 @@ int TrackingStimulator::getSelectedCircle() const
     return m_selectedCircle;
 }
 
+int TrackingStimulator::getSelectedSource() const
+{
+    return m_selectedSource;
+}
+
 void TrackingStimulator::setSelectedCircle(int ind)
 {
     m_selectedCircle = ind;
@@ -194,12 +199,13 @@ float TrackingStimulator::getStimSD() const
 {
     return m_stimSD;
 }
-bool TrackingStimulator::getIsUniform() const
+stim_mode TrackingStimulator::getStimMode() const
 {
-    if (m_isUniform)
-        return true;
-    else
-        return false;
+    return m_stimMode;
+}
+int TrackingStimulator::getTtlDuration() const
+{
+    return m_pulseDuration;
 }
 
 void TrackingStimulator::setOutputChan(int chan)
@@ -220,12 +226,15 @@ void TrackingStimulator::setStimSD(float stimSD)
 {
     m_stimSD = stimSD;
 }
-void TrackingStimulator::setIsUniform(bool isUniform)
+void TrackingStimulator::setTtlDuration(int dur)
 {
-    if (isUniform)
-        m_isUniform = 1;
-    else
-        m_isUniform = 0;
+    m_pulseDuration = dur;
+}
+
+
+void TrackingStimulator::setStimMode(stim_mode mode)
+{
+    m_stimMode = mode;
 }
 
 void TrackingStimulator::updateSettings()
@@ -310,41 +319,66 @@ void TrackingStimulator::process(AudioSampleBuffer&)
         if (stim)
         {
             // Check if timePassed >= latency
-
-            float stim_interval;
-            if (m_isUniform)  {
-                stim_interval = float(1.f / m_stimFreq);
-            }
-            else                     //gaussian
+            if (m_stimMode == ttl)
             {
-                int circleIn = isPositionWithinCircles(m_x, m_y);
-                float dist_norm = m_circles[circleIn].distanceFromCenter(m_x, m_y) / m_circles[circleIn].getRad();
-                float k = -1.0 / std::log(m_stimSD);
-                float freq_gauss = m_stimFreq*std::exp(-pow(dist_norm,2)/k);
-                stim_interval = float(1/freq_gauss);
+                if (!m_ttlTriggered)
+                {
+                    triggerEvent();
+                    m_ttlTriggered = true;
+                }
+            }
+            else
+            {
+                float stim_interval;
+                if (m_stimMode == uniform)  {
+                    stim_interval = float(1.f / m_stimFreq);
+                }
+                else if (m_stimMode == gauss)                     //gaussian
+                {
+                    int circleIn = isPositionWithinCircles(m_x, m_y);
+                    float dist_norm = m_circles[circleIn].distanceFromCenter(m_x, m_y) / m_circles[circleIn].getRad();
+                    float k = -1.0 / std::log(m_stimSD);
+                    float freq_gauss = m_stimFreq*std::exp(-pow(dist_norm,2)/k);
+                    stim_interval = float(1/freq_gauss);
+                }
+
+                float stimulationProbability = m_timePassed / stim_interval;
+                std::uniform_real_distribution<float> distribution(0.0, 1.0);
+                float randomNumber = distribution(generator);
+
+                if (stimulationProbability > 1)
+                    std::cout << "WARNING: The tracking stimulation frequency is higher than the sampling frequency." << std::endl;
+
+                if (randomNumber < stimulationProbability)
+                {
+                    triggerEvent();
+                }
             }
 
-            float stimulationProbability = m_timePassed / stim_interval;
-            std::uniform_real_distribution<float> distribution(0.0, 1.0);
-            float randomNumber = distribution(generator);
-
-            if (stimulationProbability > 1)
-                std::cout << "WARNING: The tracking stimulation frequency is higher than the sampling frequency." << std::endl;
-
-            if (randomNumber < stimulationProbability) {
-                int64 timestamp = CoreServices::getGlobalTimestamp();
-                setTimestampAndSamples(timestamp, 0);
-                uint8 ttlData = 1 << m_outputChan;
-                const EventChannel* chan = getEventChannel(getEventChannelIndex(0, getNodeId()));
-                TTLEventPtr event = TTLEvent::createTTLEvent(chan, timestamp, &ttlData, sizeof(uint8), m_outputChan);
-                addEvent(chan, event, 0);
-            }
         }
-
+        else
+            m_ttlTriggered = false;
         m_previousTime = m_currentTime;
 
         lock.exit();
     }
+}
+
+void TrackingStimulator::triggerEvent()
+{
+    int64 timestamp = CoreServices::getGlobalTimestamp();
+    setTimestampAndSamples(timestamp, 0);
+    uint8 ttlData = 1 << m_outputChan;
+    const EventChannel* chan = getEventChannel(getEventChannelIndex(0, getNodeId()));
+
+    // Send ON event
+    TTLEventPtr event = TTLEvent::createTTLEvent(chan, timestamp, &ttlData, sizeof(uint8), m_outputChan);
+    addEvent(chan, event, 0);
+
+    int eventDurationSamp = static_cast<int>(ceil(m_pulseDuration / 1000.0f * getSampleRate()));
+    uint8 ttlDataOff = 0;
+    TTLEventPtr eventOff = TTLEvent::createTTLEvent(chan, timestamp + eventDurationSamp, &ttlDataOff, sizeof(uint8), m_outputChan);
+    addEvent(chan, eventOff, 0);
 }
 
 void TrackingStimulator::handleEvent (const EventChannel* eventInfo, const MidiMessage& event, int)
@@ -488,7 +522,8 @@ bool TrackingStimulator::saveParametersXml()
 
     stim->setAttribute("freq", m_stimFreq);
     stim->setAttribute("sd", m_stimSD);
-    stim->setAttribute("uniform-gaussian", m_isUniform);
+    stim->setAttribute("stim-mode", m_stimMode);
+    stim->setAttribute("duration", m_pulseDuration);
 
     state->addChildElement(circles);
     state->addChildElement(stim);
@@ -497,7 +532,6 @@ bool TrackingStimulator::saveParametersXml()
         return false;
     else
         return true;
-
 
 }
 
@@ -530,21 +564,17 @@ bool TrackingStimulator::loadParametersXml(File fileToLoad)
                     double crad = element2->getDoubleAttribute("rad");
                     bool on = element2->getIntAttribute("on");
 
-                    Circle newCircle = Circle((float) cx, (float) cy, (float) crad, on);
+                    StimCircle newCircle = StimCircle((float) cx, (float) cy, (float) crad, on);
                     m_circles.push_back(newCircle);
 
                 }
             }
             if (element->hasTagName("STIMULATION"))
             {
-                double freq = element->getDoubleAttribute("freq");
-                double sd = element->getDoubleAttribute("sd");
-                int uni = element->getIntAttribute("uniform-gaussian");
-
-                m_stimFreq = freq;
-                m_stimSD = sd;
-                m_isUniform = uni;
-
+                m_stimFreq = element->getDoubleAttribute("freq");
+                m_stimSD = element->getDoubleAttribute("sd");
+                m_stimMode = (stim_mode) element->getIntAttribute("stim-mode");
+                m_pulseDuration = element->getIntAttribute("duration");
             }
         }
         return true;
@@ -615,7 +645,11 @@ void TrackingStimulator::load()
 
 void TrackingStimulator::saveCustomParametersToXml(XmlElement *parentElement)
 {
-    XmlElement* mainNode = parentElement->createNewChildElement("TrackingSTIMULATOR");
+    //Save
+    XmlElement* state = parentElement->createNewChildElement("TrackingStimulator");
+    state->setAttribute("Source", m_selectedSource);
+    state->setAttribute("Output", m_outputChan);
+
     // save circles
     XmlElement* circles = new XmlElement("CIRCLES");
     for (int i=0; i<m_circles.size(); i++)
@@ -630,20 +664,15 @@ void TrackingStimulator::saveCustomParametersToXml(XmlElement *parentElement)
         circles->addChildElement(circ);
     }
     // save stimulator conf
-    XmlElement* channels = new XmlElement("CHANNELS");
-    for (int i=0; i<4; i++)
-    {
-        XmlElement* chan = new XmlElement(String("Chan_")+=String(i+1));
-        chan->setAttribute("id", i);
-        chan->setAttribute("freq", m_stimFreq);
-        chan->setAttribute("sd", m_stimSD);
-        chan->setAttribute("uniform-gaussian", m_isUniform);
-        channels->addChildElement(chan);
-    }
+    XmlElement* stim = new XmlElement("STIMULATION");
 
-    mainNode->addChildElement(circles);
-    mainNode->addChildElement(channels);
+    stim->setAttribute("freq", m_stimFreq);
+    stim->setAttribute("sd", m_stimSD);
+    stim->setAttribute("stim-mode", m_stimMode);
+    stim->setAttribute("duration", m_pulseDuration);
 
+    state->addChildElement(circles);
+    state->addChildElement(stim);
 }
 
 void TrackingStimulator::loadCustomParametersFromXml()
@@ -652,8 +681,10 @@ void TrackingStimulator::loadCustomParametersFromXml()
     {
         forEachXmlChildElement(*parametersAsXml, mainNode)
         {
-            if (mainNode->hasTagName("TrackingSTIMULATOR"))
+            if (mainNode->hasTagName("TrackingStimulator"))
             {
+                m_selectedSource = mainNode->getIntAttribute("Source");
+                m_outputChan = mainNode->getIntAttribute("Output");
                 forEachXmlChildElement(*mainNode, element)
                 {
                     if (element->hasTagName("CIRCLES"))
@@ -667,104 +698,104 @@ void TrackingStimulator::loadCustomParametersFromXml()
                             double crad = element2->getDoubleAttribute("rad");
                             bool on = element2->getIntAttribute("on");
 
-                            Circle newCircle = Circle((float) cx, (float) cy, (float) crad, on);
+                            StimCircle newCircle = StimCircle((float) cx, (float) cy, (float) crad, on);
                             m_circles.push_back(newCircle);
 
                         }
-                        //                        break;
                     }
-                    if (element->hasTagName("CHANNELS"))
+                    if (element->hasTagName("STIMULATION"))
                     {
-
-                        forEachXmlChildElement(*element, element2)
-                        {
-                            int id = element2->getIntAttribute("id");
-                            if (id<4) //pulse pal channels
-                            {
-                                double freq = element2->getDoubleAttribute("freq");
-                                double sd = element2->getDoubleAttribute("sd");
-                                int uni = element2->getIntAttribute("uniform-gaussian");
-
-                                m_stimFreq = freq;
-                                m_stimSD = sd;
-                                m_isUniform = uni;
-                            }
-
-                        }
-                        break;
+                        m_stimFreq = element->getDoubleAttribute("freq");
+                        m_stimSD = element->getDoubleAttribute("sd");
+                        m_stimMode = (stim_mode) element->getIntAttribute("stim-mode");
+                        m_pulseDuration = element->getIntAttribute("duration");
                     }
                 }
-
             }
         }
     }
 }
 
+// StimArea methods
 
-// Circle methods
 
-Circle::Circle()
-    : m_cx(0),
-      m_cy(0),
-      m_rad(0)
-{}
-
-Circle::Circle(float x, float y, float rad, bool on)
+StimArea::StimArea() :
+    m_cx(0),
+    m_cy(0),
+    m_on(false)
 {
-    m_cx = x;
-    m_cy = y;
-    m_rad = rad;
-    m_on = on;
 }
 
-float Circle::getX()
+StimArea::StimArea(float x, float y, bool on) :
+    m_cx(x),
+    m_cy(y),
+    m_on(on)
+{
+}
+
+float StimArea::getX()
 {
     return m_cx;
 }
-float Circle::getY()
+float StimArea::getY()
 {
     return m_cy;
 }
-float Circle::getRad()
-{
-    return m_rad;
-}
-bool Circle::getOn()
+bool StimArea::getOn()
 {
     return m_on;
 }
-void Circle::setX(float x)
+
+void StimArea::setX(float x)
 {
     m_cx = x;
 }
-void Circle::setY(float y)
+void StimArea::setY(float y)
 {
     m_cy = y;
-}
-void Circle::setRad(float rad)
-{
-    m_rad = rad;
-}
-void Circle::set(float x, float y, float rad, bool on)
-{
-    m_cx = x;
-    m_cy = y;
-    m_rad = rad;
-    m_on = on;
 }
 
-bool Circle::on()
+bool StimArea::on()
 {
     m_on = true;
     return m_on;
 }
-bool Circle::off()
+bool StimArea::off()
 {
     m_on = false;
     return m_on;
 }
 
-bool Circle::isPositionIn(float x, float y)
+// Circle methods
+
+StimCircle::StimCircle()
+    : m_rad(0), StimArea(0, 0, false)
+{
+}
+
+StimCircle::StimCircle(float x, float y, float rad, bool on) : StimArea(x, y, on)
+{
+    m_rad = rad;
+}
+
+float StimCircle::getRad()
+{
+    return m_rad;
+}
+
+void StimCircle::setRad(float rad)
+{
+    m_rad = rad;
+}
+void StimCircle::set(float x, float y, float rad, bool on)
+{
+    m_cx = x;
+    m_cy = y;
+    m_rad = rad;
+    m_on = on;
+}
+
+bool StimCircle::isPositionIn(float x, float y)
 {
     if (pow(x - m_cx,2) + pow(y - m_cy,2)
             <= m_rad*m_rad)
@@ -773,8 +804,69 @@ bool Circle::isPositionIn(float x, float y)
         return false;
 }
 
-float Circle::distanceFromCenter(float x, float y){
+float StimCircle::distanceFromCenter(float x, float y){
     return sqrt(pow(x - m_cx,2) + pow(y - m_cy,2));
+}
+
+String StimCircle::returnType()
+{
+    return String("circle");
+}
+
+// Rect methods
+
+StimRect::StimRect()
+    : m_w(0), m_h(0), StimArea(0, 0, false)
+{
+}
+
+StimRect::StimRect(float x, float y, float w, float h, bool on) : StimArea(x, y, on)
+{
+    m_w = w;
+    m_h = h;
+}
+
+float StimRect::getW()
+{
+    return m_w;
+}
+float StimRect::getH()
+{
+    return m_h;
+}
+
+void StimRect::setW(float w)
+{
+    m_w = w;
+}
+void StimRect::setH(float h)
+{
+    m_h = h;
+}
+void StimRect::set(float x, float y, float w, float h, bool on)
+{
+    m_cx = x;
+    m_cy = y;
+    m_w = w;
+    m_h = h;
+    m_on = on;
+}
+
+bool StimRect::isPositionIn(float x, float y)
+{
+    if ((std::abs(x - m_cx) < m_w / 2.0) && (std::abs(y - m_cy) < m_h / 2.0))
+        return true;
+    else
+        return false;
+}
+
+float StimRect::distanceFromCenter(float x, float y){
+    return std::abs(x - m_cx) + std::abs(y - m_cy);
+}
+
+String StimRect::returnType()
+{
+    return String("rect");
 }
 
 

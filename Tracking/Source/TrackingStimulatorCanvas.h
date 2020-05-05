@@ -129,6 +129,7 @@ private:
     ScopedPointer<UtilityButton> circlesButton[MAX_CIRCLES];
     ScopedPointer<UtilityButton> uniformButton;
     ScopedPointer<UtilityButton> gaussianButton;
+    ScopedPointer<UtilityButton> ttlButton;
 
     ScopedPointer<ComboBox> availableChans;
     ScopedPointer<ComboBox> outputChans;
@@ -147,6 +148,7 @@ private:
     ScopedPointer<Label> onLabel;
     ScopedPointer<Label> fmaxLabel;
     ScopedPointer<Label> sdevLabel;
+    ScopedPointer<Label> durationLabel;
 
     // Labels with editable test
     ScopedPointer<Label> cxEditLabel;
@@ -154,6 +156,7 @@ private:
     ScopedPointer<Label> cradEditLabel;
     ScopedPointer<Label> fmaxEditLabel;
     ScopedPointer<Label> sdevEditLabel;
+    ScopedPointer<Label> durationEditLabel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TrackingStimulatorCanvas);
 };
