@@ -31,8 +31,6 @@
 
 #include "TrackingNodeEditor.h"
 #include "TrackingNode.h"
-#include "../../AccessClass.h"
-#include "../../UI/EditorViewport.h"
 
 TrackingNodeEditor::TrackingNodeEditor (GenericProcessor* parentNode, bool useDefaultParameterEditors = true)
     : GenericEditor (parentNode, useDefaultParameterEditors)

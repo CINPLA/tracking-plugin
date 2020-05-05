@@ -47,6 +47,7 @@
 #define DEF_VOLTAGE 5
 #define DEF_FREQ 2
 #define DEF_SD 0.5
+#define DEF_DUR 2
 
 #define TRACKING_FREQ 20
 
@@ -54,43 +55,97 @@
 
 /**
 
-  Class for Circles
+  Class for Abstrac Stimulation Area
 
 */
-class Circle
+class StimArea
 {
 public:
-    Circle();
-    Circle(float x, float y, float r, bool on);
+    StimArea();
+    StimArea(float x, float y, bool on);
 
     float getX();
     float getY();
-    float getRad();
     bool getOn();
-
     void setX(float x);
     void setY(float y);
-    void setRad(float rad);
-    void set(float x, float y, float rad, bool on);
 
     bool on();
     bool off();
 
-    bool isPositionIn(float x, float y);
-    float distanceFromCenter(float x, float y);
+    virtual bool isPositionIn(float x, float y) = 0;
+    virtual float distanceFromCenter(float x, float y) = 0;
+    virtual String returnType() = 0;
 
-private:
+protected:
 
     float m_cx;
     float m_cy;
-    float m_rad;
     bool m_on;
 
+};
+/**
+
+  Class for Stimulation Circles
+
+*/
+class StimCircle : public StimArea
+{
+public:
+    StimCircle();
+    StimCircle(float x, float y, float r, bool on);
+
+    float getRad();
+
+    void setRad(float rad);
+    void set(float x, float y, float rad, bool on);
+
+    bool isPositionIn(float x, float y);
+    float distanceFromCenter(float x, float y);
+    String returnType();
+
+private:
+    float m_rad;
 };
 
 /**
 
-    Uses peaks to estimate the phase of a continuous signal.
+  Class for Stimulation Rectangle
+
+*/
+class StimRect : public StimArea
+{
+public:
+    StimRect();
+    StimRect(float x, float y, float w, float h, bool on);
+
+    float getW();
+    float getH();
+
+    void setW(float w);
+    void setH(float h);
+    void set(float x, float y, float w, float h, bool on);
+
+    bool isPositionIn(float x, float y) override;
+    float distanceFromCenter(float x, float y) override;
+    String returnType() override;
+
+private:
+    float m_w;
+    float m_h;
+};
+
+
+typedef enum
+{
+  uniform,
+  gauss,
+  ttl
+} stim_mode;
+
+/**
+
+    Select stimulation regions for closed-loop tracking stimulation.
 
     @see GenericProcessor, TrackingStimulatorEditor, TrackingStimulatorCanvas
 */
@@ -98,8 +153,6 @@ class TrackingStimulator : public GenericProcessor
 {
 
 public:
-
-    enum priority {REPFIRST, TRAINFIRST};
 
     TrackingStimulator();
     ~TrackingStimulator();
@@ -126,8 +179,8 @@ public:
     int getNSources() const;
     TrackingSources& getTrackingSource(int s) const;
 
-    std::vector<Circle> getCircles();
-    void addCircle(Circle c);
+    std::vector<StimCircle> getCircles();
+    void addCircle(StimCircle c);
     void editCircle(int ind, float x, float y, float rad, bool on);
     void deleteCircle(int ind);
     void disableCircles();
@@ -141,7 +194,9 @@ public:
 
     float getStimFreq() const;
     float getStimSD() const;
-    bool getIsUniform() const;
+//    bool getIsUniform() const;
+    stim_mode getStimMode() const;
+    int getTtlDuration() const;
 
     void setSimulateTrajectory(bool sim);
     void setOutputChan(int chan);
@@ -149,7 +204,9 @@ public:
 
     void setStimFreq(float stimFreq);
     void setStimSD(float stimSD);
-    void setIsUniform(bool isUniform);
+//    void setIsUniform(bool isUniform);
+    void setStimMode(stim_mode mode);
+    void setTtlDuration(int dur);
 
     void clearPositionDisplayedUpdated();
     bool positionDisplayedIsUpdated() const;
@@ -177,6 +234,7 @@ private:
     float m_timePassed;
     int64 m_previousTime;
     int64 m_currentTime;
+    bool m_ttlTriggered;
 
     std::default_random_engine generator;
 
@@ -202,13 +260,15 @@ private:
     bool m_simulateTrajectory;
     bool m_colorUpdated;
 
-    std::vector<Circle> m_circles;
+    std::vector<StimCircle> m_circles;
     int m_selectedCircle;
 
     // Stimulation params
     float m_stimFreq;
     float m_stimSD;
-    int m_isUniform;
+//    int m_isUniform;
+    stim_mode m_stimMode;
+    int m_pulseDuration;
 
     // Selected stimulation chan
     int m_outputChan;
@@ -218,6 +278,7 @@ private:
 
     // Stimulate decision
     bool stimulate();
+    void triggerEvent();
 
     bool saveParametersXml();
     bool loadParametersXml(File loadFile);
